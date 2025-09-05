@@ -1,0 +1,3 @@
+[submodule "third-party/SymbulationEmp"]
+	path = third-party/SymbulationEmp
+	url = https://github.com/amlalejini/SymbulationEmp.git
