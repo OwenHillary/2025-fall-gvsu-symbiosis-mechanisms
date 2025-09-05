@@ -208,3 +208,7 @@ __marimo__/
 
 # Python virtual environment
 pyenv/
+
+# Data files
+*.csv
+*.dat
