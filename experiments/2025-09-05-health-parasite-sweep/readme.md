@@ -2,6 +2,13 @@
 
 Purpose: exploratory parameter sweep for health parasites
 
+## Lessons learned
+
+Paused runs. Too many combinations of parameters to complete in reasonable period of time for exploratory experiments. Changed important model details, motivating new (more focused) runs.
+
+## Planning
+
+
 Explore these variables:
 
 - Parasites
