@@ -214,3 +214,5 @@ pyenv/
 *.dat
 
 *.txt
+
+.DS_Store
