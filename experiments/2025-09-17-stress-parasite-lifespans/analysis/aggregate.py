@@ -57,7 +57,9 @@ run_cfg_fields_time_series = {
     "PARASITE_DEATH_CHANCE",
     "PARASITE_NUM_OFFSPRING_ON_STRESS_INTERACTION",
     "START_MOI",
-    "BASE_DEATH_CHANCE"
+    "BASE_DEATH_CHANCE",
+    "HOST_MIN_CYCLES_BEFORE_REPRO",
+    "SYM_MIN_CYCLES_BEFORE_REPRO"
 }
 
 org_counts_fields_time_series = {
