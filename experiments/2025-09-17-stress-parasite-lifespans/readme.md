@@ -1,5 +1,10 @@
 # 2025-09-17 Experiment
 
+## Takeaways
+
+- We see EQU evolve at longer minimum lifespans. E.g., host/sym = 150/75, 200/100, 200/200
+  - 150/75 and 200/100 seem like solid choices moving forward.
+
 ## Planning
 
 Focus on settings from 2025-09-15-stress-parasite experiment that had the highest average number of different tasks evolve in hosts: SF=30_PDC=0.5_PO=8
