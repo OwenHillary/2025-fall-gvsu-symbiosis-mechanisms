@@ -52,14 +52,12 @@ run_cfg_fields_summary = {
 }
 
 run_cfg_fields_time_series = {
+    "START_MOI",
     "SEED",
+    "STRESS_TYPE",
     "STRESS_FREQUENCY",
     "PARASITE_DEATH_CHANCE",
-    "PARASITE_NUM_OFFSPRING_ON_STRESS_INTERACTION",
-    "START_MOI",
-    "BASE_DEATH_CHANCE",
-    "HOST_MIN_CYCLES_BEFORE_REPRO",
-    "SYM_MIN_CYCLES_BEFORE_REPRO"
+    "BASE_DEATH_CHANCE"
 }
 
 org_counts_fields_time_series = {
