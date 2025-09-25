@@ -538,9 +538,9 @@ Quantify whether tasks have been performed over course of entire run.
 over_time_sym_parent_task_data <- time_data %>%
   select(
     SEED,
-    START_MOI,
-    HOST_MIN_CYCLES_BEFORE_REPRO,
-    SYM_MIN_CYCLES_BEFORE_REPRO,
+    STRESS_FREQUENCY,
+    STRESS_TYPE,
+    stress_death_chance,
     treatment,
     update,
     CurUpdate_AND_NOT_in_sym_parent_org_counts,
@@ -588,9 +588,9 @@ sym_parent_tasks_all_time_by_task <- over_time_sym_parent_task_data %>%
     SEED,
     treatment,
     task,
-    START_MOI,
-    HOST_MIN_CYCLES_BEFORE_REPRO,
-    SYM_MIN_CYCLES_BEFORE_REPRO
+    STRESS_FREQUENCY,
+    STRESS_TYPE,
+    stress_death_chance
   ) %>%
   summarize(
     n = n(),
@@ -600,9 +600,9 @@ sym_parent_tasks_all_time_by_task <- over_time_sym_parent_task_data %>%
   group_by(
     treatment,
     task,
-    START_MOI,
-    HOST_MIN_CYCLES_BEFORE_REPRO,
-    SYM_MIN_CYCLES_BEFORE_REPRO
+    STRESS_FREQUENCY,
+    STRESS_TYPE,
+    stress_death_chance
   ) %>%
   summarize(
     n = n(),
@@ -624,7 +624,7 @@ sym_parent_tasks_all_time_by_task_plt <- sym_parent_tasks_all_time_by_task %>%
   theme(
     legend.position = "none",
     axis.text.x = element_text(
-      angle = 30,
+      angle = 65,
       hjust = 1
     )
   )
@@ -644,9 +644,9 @@ total_different_sym_parent_tasks_all_time <- over_time_sym_parent_task_data %>%
     SEED,
     treatment,
     task,
-    START_MOI,
-    HOST_MIN_CYCLES_BEFORE_REPRO,
-    SYM_MIN_CYCLES_BEFORE_REPRO
+    STRESS_FREQUENCY,
+    STRESS_TYPE,
+    stress_death_chance
   ) %>%
   # Summarize across updates whether task was ever completed by a parent.
   summarize(
@@ -657,9 +657,9 @@ total_different_sym_parent_tasks_all_time <- over_time_sym_parent_task_data %>%
   group_by(
     SEED,
     treatment,
-    START_MOI,
-    HOST_MIN_CYCLES_BEFORE_REPRO,
-    SYM_MIN_CYCLES_BEFORE_REPRO
+    STRESS_FREQUENCY,
+    STRESS_TYPE,
+    stress_death_chance
   ) %>%
   # Summarize across tasks (by seed)
   summarize(
