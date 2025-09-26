@@ -1,5 +1,15 @@
 # 2025-09-25 Health Experiment
 
+## Takeaways
+
+- Reasonable parameters for health interaction parasites:
+  - Interaction chance = 1.0 (better than 0.5)
+  - IC=1_PBC=0.25_SM=8
+  - IC=1_PBC=0.5_SM=4
+  - IC=1_PBC=0.5_SM=8 ** (top ranked for both)
+  - IC=1_PBC=0.75_SM=2
+  - IC=1_PBC=0.75_SM=4
+
 ## Planning
 
 Just parasites to start? Also mutualists?
