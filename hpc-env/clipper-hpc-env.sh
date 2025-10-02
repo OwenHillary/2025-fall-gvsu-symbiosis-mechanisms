@@ -1,4 +1,4 @@
-PROJECT_NAME=Aagos
+# PROJECT_NAME=Aagos
 # REPO_DIR=~/devo_ws/Aagos
 
 module purge
