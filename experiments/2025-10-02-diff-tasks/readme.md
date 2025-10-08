@@ -6,6 +6,11 @@ Goal:
 Ideas:
 - Preferential replacement? (more resources means more defense against replacement for hosts)
 
+## Next steps
+
+- Run with mutualists / parasites
+- Think about
+
 ## Planning
 
 - START_MOI=0
@@ -29,3 +34,8 @@ Task reward distribution
   - RES=128,CYC=4: 16 tasks per repro
 - EQU: 16 (9 instructions)
   - RES=128,CYC:4: 8 tasks per repro
+
+- CPU=16,MC=64,HRR=256
+  - NOT (rew=1): Need to do 256 NOT => 768 cycles => 48 updates
+  - NOR (rew=8): Need to do 32 NOR => 224 cycles => 14 udpates
+  - EQU (rew=16): Need to do 16 EQU => ~160 cycles (@10 insts) => 10 updates
