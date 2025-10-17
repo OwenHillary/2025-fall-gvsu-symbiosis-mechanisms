@@ -56,16 +56,15 @@ run_cfg_fields_summary = {
     "PARASITE_NUM_OFFSPRING_ON_STRESS_INTERACTION",
     "START_MOI",
     "BASE_DEATH_CHANCE",
-    "SEED"
+    "SEED",
+    "NUTRIENT_STEAL_PROP",
+    "PARASITE_BASE_TASK_VALUE_PROP",
+    "NUTRIENT_INTERACTION_MULTIPLIER"
 }
 
 run_cfg_fields_time_series = {
-    "START_MOI",
-    "SEED",
-    "CYCLES_PER_UPDATE",
-    "HOST_MIN_CYCLES_BEFORE_REPRO",
-    "HOST_REPRO_RES",
-    "HOST_ONLY_FIRST_TASK_CREDIT"
+    "SEED", 
+    "NUTRIENT_STEAL_PROP"
 }
 
 org_counts_fields_time_series = {
