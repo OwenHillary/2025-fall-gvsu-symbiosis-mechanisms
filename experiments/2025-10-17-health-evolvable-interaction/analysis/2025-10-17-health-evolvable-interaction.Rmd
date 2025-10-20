@@ -765,4 +765,244 @@ ggsave(
 
 ## Symbiont interaction values
 
-TODO
+Load symbiont interaction values
+
+```{r}
+sym_int_vals_path <-  paste(
+  working_directory,
+  "data",
+  "symbiont_interaction_values.csv",
+  sep = "/"
+)
+sym_int_vals_data <- read_csv(sym_int_vals_path)
+
+sym_int_vals_data <- sym_int_vals_data %>%
+  mutate(
+    SEED = as.factor(SEED),
+    START_MOI = as.factor(START_MOI),
+    VERTICAL_TRANSMISSION = as.factor(VERTICAL_TRANSMISSION),
+    MUTUALIST_CYCLE_DONATE_MULTIPLIER = as.factor(MUTUALIST_CYCLE_DONATE_MULTIPLIER), # nolint: line_length_linter.
+    PARASITE_CYCLE_STEAL_MULTIPLIER = as.factor(PARASITE_CYCLE_STEAL_MULTIPLIER), # nolint: line_length_linter.
+    HEALTH_TYPE = as.factor(HEALTH_TYPE),
+    PARASITE_CYCLE_LOSS_PROP = as.factor(PARASITE_CYCLE_LOSS_PROP),
+    HEALTH_INTERACTION_CHANCE = as.factor(HEALTH_INTERACTION_CHANCE),
+    PARASITE_BASE_CYCLE_PROP = as.factor(PARASITE_BASE_CYCLE_PROP)
+  ) %>%
+  mutate(
+    treatment = paste0(
+      "VT=", VERTICAL_TRANSMISSION,
+      "_DM=", MUTUALIST_CYCLE_DONATE_MULTIPLIER,
+      "_SM=", PARASITE_CYCLE_STEAL_MULTIPLIER
+    ),
+    interaction_multiplier = as.factor(PARASITE_CYCLE_STEAL_MULTIPLIER)
+  ) %>%
+  mutate(
+    treatment = as.factor(
+      treatment
+    ),
+    # Note: could come back to this to adjust how we do sorting
+    super_mutualist_prop = (Hist_0.8 + Hist_0.9) / count
+  )
+
+# Give each seed a rep_id based on its super mutualist prop
+sym_int_vals_data <- sym_int_vals_data %>%
+  group_by(
+    treatment
+  ) %>%
+  arrange(
+    super_mutualist_prop
+  ) %>%
+  mutate(
+    rep_id = rep(1:20, 1)
+  ) %>%
+  ungroup()
+
+```
+
+Pivot on histogram columns to long format
+
+```{r}
+long_sym_int_vals_data <- sym_int_vals_data %>%
+  select(
+    SEED,
+    VERTICAL_TRANSMISSION,
+    MUTUALIST_CYCLE_DONATE_MULTIPLIER,
+    PARASITE_CYCLE_STEAL_MULTIPLIER,
+    treatment,
+    interaction_multiplier,
+    count,
+    rep_id,
+    super_mutualist_prop,
+    "Hist_-0.1",
+    "Hist_-0.2",
+    "Hist_-0.3",
+    "Hist_-0.4",
+    "Hist_-0.5",
+    "Hist_-0.6",
+    "Hist_-0.7",
+    "Hist_-0.8",
+    "Hist_-0.9",
+    "Hist_-1",
+    "Hist_0.0",
+    "Hist_0.1",
+    "Hist_0.2",
+    "Hist_0.3",
+    "Hist_0.4",
+    "Hist_0.5",
+    "Hist_0.6",
+    "Hist_0.7",
+    "Hist_0.8",
+    "Hist_0.9"
+  ) %>%
+  rename(total_syms = count) %>%
+  pivot_longer(
+    cols = -c(
+      SEED,
+      VERTICAL_TRANSMISSION,
+      MUTUALIST_CYCLE_DONATE_MULTIPLIER,
+      PARASITE_CYCLE_STEAL_MULTIPLIER,
+      treatment,
+      interaction_multiplier,
+      total_syms,
+      super_mutualist_prop,
+      rep_id
+    ),
+    names_to = "int_val_range",
+    values_to = "int_val_count"
+  ) %>%
+  mutate(
+    int_val_range = as.factor(int_val_range)
+  )
+```
+
+Summarize interaction value ranges:
+- Collapse bins to fewer categories, matching with ALife 2025
+  tag paper bins.
+
+```{r}
+long_sym_int_vals_data <- long_sym_int_vals_data %>%
+  # Recategorize
+  mutate(
+    int_val_range_reduced = case_when(
+      int_val_range == "Hist_-1" ~ "-1.0 to -0.8 (Parasitic)",
+      int_val_range == "Hist_-0.9" ~ "-1.0 to -0.8 (Parasitic)",
+      int_val_range == "Hist_-0.8" ~ "-0.8 to -0.6 (Parasitic)",
+      int_val_range == "Hist_-0.7" ~ "-0.8 to -0.6 (Parasitic)",
+      int_val_range == "Hist_-0.6" ~ "-0.6 to -0.4 (Detrimental)",
+      int_val_range == "Hist_-0.5" ~ "-0.6 to -0.4 (Detrimental)",
+      int_val_range == "Hist_-0.4" ~ "-0.4 to -0.2 (Detrimental)",
+      int_val_range == "Hist_-0.3" ~ "-0.4 to -0.2 (Detrimental)",
+      int_val_range == "Hist_-0.2" ~ "-0.2 to 0 (Nearly neutral)",
+      int_val_range == "Hist_-0.1" ~ "-0.2 to 0 (Nearly neutral)",
+      int_val_range == "Hist_0.0" ~ "0 to 0.2 (Nearly neutral)",
+      int_val_range == "Hist_0.1" ~ "0 to 0.2 (Nearly neutral)",
+      int_val_range == "Hist_0.2" ~ "0.2 to 0.4 (Positive)",
+      int_val_range == "Hist_0.3" ~ "0.2 to 0.4 (Positive)",
+      int_val_range == "Hist_0.4" ~ "0.4 to 0.6 (Positive)",
+      int_val_range == "Hist_0.5" ~ "0.4 to 0.6 (Positive)",
+      int_val_range == "Hist_0.6" ~ "0.6 to 0.8 (Mutualistic)",
+      int_val_range == "Hist_0.7" ~ "0.6 to 0.8 (Mutualistic)",
+      int_val_range == "Hist_0.8" ~ "0.8 to 1.0 (Mutualistic)",
+      int_val_range == "Hist_0.9" ~ "0.8 to 1.0 (Mutualistic)",
+      .default = "unknown"
+    )
+  ) %>%
+  mutate(
+    int_val_range_reduced = factor(
+      int_val_range_reduced,
+      levels = c(
+        "-1.0 to -0.8 (Parasitic)",
+        "-0.8 to -0.6 (Parasitic)",
+        "-0.6 to -0.4 (Detrimental)",
+        "-0.4 to -0.2 (Detrimental)",
+        "-0.2 to 0 (Nearly neutral)",
+        "0 to 0.2 (Nearly neutral)",
+        "0.2 to 0.4 (Positive)",
+        "0.4 to 0.6 (Positive)",
+        "0.6 to 0.8 (Mutualistic)",
+        "0.8 to 1.0 (Mutualistic)"
+      )
+    )
+  ) %>%
+  # Collapse
+  group_by(
+    SEED,
+    total_syms, # Note: total syms will be same for all rows of same seed.
+    VERTICAL_TRANSMISSION,
+    MUTUALIST_CYCLE_DONATE_MULTIPLIER,
+    PARASITE_CYCLE_STEAL_MULTIPLIER,
+    treatment,
+    interaction_multiplier,
+    int_val_range_reduced,
+    rep_id
+  ) %>%
+  summarize(
+    int_val_count = sum(int_val_count)
+  ) %>%
+  mutate(
+    int_val_prop = int_val_count / total_syms,
+    VT = VERTICAL_TRANSMISSION,
+    INT_MULT = interaction_multiplier
+  )
+
+# Order by "proportion of ubermutualists"
+# test <- long_sym_int_vals_data %>%
+#   group_by(
+#     SEED
+#   )
+
+```
+
+```{r}
+tenhelix <- c(
+  "#891901",
+  "#B50142",
+  "#D506AD",
+  "#AB08FF",
+  "#5731FD",
+  "#4755FF",
+  "#42bcf5",
+  "#42e0f5",
+  "#9af1fc",
+  "#c5f6fc"
+)
+sym_int_val_props_plt <- long_sym_int_vals_data %>%
+  ggplot(
+    mapping = aes(
+      fill = int_val_range_reduced,
+      x = rep_id,
+      y = int_val_count,
+      na.rm = TRUE
+    )
+  ) +
+  geom_col(
+    position = "fill",
+    na.rm = TRUE,
+    width = 1
+  ) +
+  scale_fill_manual(
+    name = "Behavior",
+    values = tenhelix
+  ) +
+  labs(
+    x = "Replicate",
+    y = "Proportion of symbiont population"
+  ) +
+  facet_grid(
+    INT_MULT ~ VT,
+    labeller = label_both
+  ) +
+  guides(
+    fill = guide_legend(nrow = 2, byrow = TRUE)
+  ) +
+  theme(
+    legend.position = "bottom"
+  )
+
+ggsave(
+  file = paste(plot_dir, "sym_interaction_value_counts.pdf", sep = "/"),
+  plot = sym_int_val_props_plt,
+  width = 30,
+  height = 20
+)
+```
