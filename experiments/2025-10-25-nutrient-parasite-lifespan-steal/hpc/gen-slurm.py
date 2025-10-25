@@ -55,8 +55,7 @@ fixed_parameters = {
     "HORIZONTAL_TRANSMISSION_COMPATIBILITY_MODE": "task-profile-strictly-stronger-match",
     "CYCLES_PER_UPDATE": "4",
     "HOST_ONLY_FIRST_TASK_CREDIT": "1",
-    "PARASITE_NUM_OFFSPRING_ON_STRESS_INTERACTION": "8",
-    "START_MOI": "0",
+    "START_MOI": "1",
     
     # Important 
     "SYM_HORIZ_TRANS_RES": "40",
