@@ -19,6 +19,7 @@ import utilities as utils
 
 # Default configuration values
 default_seed_offset = 1000
+default_account = None
 default_num_replicates = 30
 default_job_time_request = "8:00:00"
 default_job_mem_request = "8G"
@@ -101,6 +102,7 @@ def main():
     parser.add_argument("--replicates", type=int, default=default_num_replicates, help="How many replicates should we run of each condition?")
     parser.add_argument("--job_dir", type=str, default=None, help="Where to output these job files? If none, put in 'jobs' directory inside of the data_dir")
     parser.add_argument("--seed_offset", type=int, default=default_seed_offset, help="Value to offset random number seeds by")
+    parser.add_argument("--hpc_account", type=str, default=default_account, help="Value to use for the slurm ACCOUNT")
     parser.add_argument("--time_request", type=str, default=default_job_time_request, help="How long to request for each job on hpc?")
     parser.add_argument("--mem", type=str, default=default_job_mem_request, help="How much memory to request for each job?")
     parser.add_argument("--runs_per_subdir", type=int, default=-1, help="How many replicates to clump into job subdirectories")
@@ -164,7 +166,11 @@ def main():
         file_str = file_str.replace("<<REPO_DIR>>", repo_dir)
         file_str = file_str.replace("<<EXEC>>", executable)
         file_str = file_str.replace("<<JOB_SEED_OFFSET>>", str(cur_seed))
-        
+        if args.hpc_account is None:
+            file_str = file_str.replace("<<HPC_ACCOUNT_INFO>>", "")
+        else:
+            file_str = file_str.replace("<<HPC_ACCOUNT_INFO>>", f"#SBATCH --account {args.hpc_account}")
+
 
         if args.hpc_env_file is None:
             file_str = file_str.replace("<<SETUP_HPC_ENV>>", "")
