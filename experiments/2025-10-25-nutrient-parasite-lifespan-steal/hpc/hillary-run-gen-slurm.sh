@@ -11,7 +11,7 @@ RUNS_PER_SUBDIR=950
 USERNAME=hillaryo
 SCRATCH_DIR=lalejina
 
-ACCOUNT=""
+
 
 HPC_ENV_FILE=clipper-hpc-env.sh
 # HPC_ENV_FILE=msu-hpc-env.sh
