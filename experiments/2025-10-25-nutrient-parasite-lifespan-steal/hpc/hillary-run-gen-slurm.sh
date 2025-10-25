@@ -9,6 +9,7 @@ PROJECT_NAME=2025-fall-gvsu-symbiosis-mechanisms
 RUNS_PER_SUBDIR=950
 
 USERNAME=hillaryo
+SCRATCH_DIR=lalejina
 
 ACCOUNT=devolab
 
@@ -19,8 +20,8 @@ REPO_DIR=/mnt/home/${USERNAME}/repo_ws/${PROJECT_NAME} # <-- CHANGE THIS to wher
 REPO_SCRIPTS_DIR=${REPO_DIR}/scripts
 HOME_EXP_DIR=${REPO_DIR}/experiments/${EXP_SLUG}
 
-DATA_DIR=/mnt/scratch/${USERNAME}/data/${PROJECT_NAME}/${EXP_SLUG}
-# DATA_DIR=/mnt/scratch/${USERNAME}_scratch/${PROJECT_NAME}/${EXP_SLUG}
+# DATA_DIR=/mnt/scratch/${SCRATCH_DIR}/data/${PROJECT_NAME}/${EXP_SLUG}
+DATA_DIR=/mnt/scratch/${SCRATCH_DIR}_scratch/${USERNAME}/${PROJECT_NAME}/${EXP_SLUG}
 JOB_DIR=${DATA_DIR}/jobs
 CONFIG_DIR=${HOME_EXP_DIR}/hpc/config
 HPC_ENV_FILEPATH=${REPO_DIR}/hpc-env/${HPC_ENV_FILE}
