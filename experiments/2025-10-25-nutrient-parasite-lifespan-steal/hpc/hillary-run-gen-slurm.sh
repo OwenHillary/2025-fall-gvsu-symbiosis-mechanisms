@@ -11,8 +11,6 @@ RUNS_PER_SUBDIR=950
 USERNAME=hillaryo
 SCRATCH_DIR=lalejina
 
-ACCOUNT=None
-
 HPC_ENV_FILE=clipper-hpc-env.sh
 # HPC_ENV_FILE=msu-hpc-env.sh
 
@@ -42,5 +40,4 @@ python3 gen-slurm.py \
   --replicates ${REPLICATES} \
   --job_dir ${JOB_DIR} \
   --seed_offset ${SEED_OFFSET} \
-  --hpc_account ${ACCOUNT} \
   --hpc_env_file ${HPC_ENV_FILEPATH}
