@@ -34,10 +34,10 @@ combos = CombinationCollector()
 # Parameters that do not change across treatments for this experiment.
 fixed_parameters = {
     "DATA_INT": "100",
-    "GRID_X": "100",
-    "GRID_Y": "100",
+    "GRID_X": "80",
+    "GRID_Y": "80",
     "POP_SIZE": "-1",
-    "UPDATES": "250000",
+    "UPDATES": "200000",
     "HORIZ_TRANS": "1",
     "GRID": "0",
     "OUSTING": "1",
