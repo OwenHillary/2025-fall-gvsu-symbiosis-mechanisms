@@ -62,6 +62,7 @@ run_cfg_fields_summary = {
     "NUTRIENT_INTERACTION_MULTIPLIER"
 }
 
+# This is what vars we want to track
 run_cfg_fields_time_series = {
     "SEED", 
     "NUTRIENT_STEAL_PROP",
