@@ -11,20 +11,22 @@ library(rstatix)
 library(knitr)
 library(kableExtra)
 library(viridis)
+
 # library(webshot2)
 ```
 
 ```{r}
 # Build relative path from R's working directory to what is actually the working
 # directory for this experiment.
-experiment_slug <- "2025-10-07-test-work-flow"
+experiment_slug <- "2025-10-25-nutrient-parasite-lifespan-steal"
 working_directory <- paste(
-  "2025-fall-gvsu-symbiosis-mechanisms",
+  # "2025-fall-gvsu-symbiosis-mechanisms",
   "experiments",
   experiment_slug,
   "analysis",
   sep = "/"
 )
+print(working_directory)
 ```
 
 ```{r}
@@ -33,9 +35,11 @@ theme_set(theme_cowplot())
 # Create directory to save plots
 plot_dir <- paste(
   working_directory,
-  "plots",
+  "plots3-HstSteal",
   sep = "/"
 )
+
+
 dir.create(
   plot_dir,
   showWarnings = FALSE
@@ -46,7 +50,7 @@ dir.create(
 
 ```{r}
 tasks <- c("NOT", "NAND", "OR_NOT", "AND", "OR", "AND_NOT", "NOR", "XOR", "EQU")
-max_pop_size <- 60 * 60
+max_pop_size <- 80 * 80
 threshold <- 0.025 * max_pop_size
 ```
 
@@ -64,7 +68,8 @@ summary_data <- read_csv(summary_data_path)
 summary_data <- summary_data %>%
   mutate(
     SEED = as.factor(SEED),
-    
+    HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO),
+    SYM_MIN_CYCLES_BEFORE_REPRO = as.factor(SYM_MIN_CYCLES_BEFORE_REPRO),
     NUTRIENT_STEAL_PROP = as.factor(NUTRIENT_STEAL_PROP),
     START_MOI = as.factor(START_MOI),
     HEALTH_TYPE = as.factor(HEALTH_TYPE),
@@ -75,7 +80,9 @@ summary_data <- summary_data %>%
   ) %>%
   mutate(
     treatment = paste0(
-      "NSP=", NUTRIENT_STEAL_PROP 
+      "NSP=", NUTRIENT_STEAL_PROP, 
+      "Hrepo=", HOST_MIN_CYCLES_BEFORE_REPRO
+      #"Srepo=", SYM_MIN_CYCLES_BEFORE_REPRO
     )
   ) %>%
   mutate(
@@ -98,12 +105,15 @@ time_data <- read_csv(time_data_path)
 time_data <- time_data %>%
   mutate(
     SEED = as.factor(SEED),
-    
+    HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO),
+    # SYM_MIN_CYCLES_BEFORE_REPRO = as.factor(SYM_MIN_CYCLES_BEFORE_REPRO),
     NUTRIENT_STEAL_PROP = as.factor(NUTRIENT_STEAL_PROP),
   ) %>%
   mutate(
     treatment = paste0(
-      "NSP=", NUTRIENT_STEAL_PROP 
+      "NSP=", NUTRIENT_STEAL_PROP,
+      "Hrepo=", HOST_MIN_CYCLES_BEFORE_REPRO
+      # "Srepo=", SYM_MIN_CYCLES_BEFORE_REPRO
     )
   ) %>%
   mutate(
@@ -167,7 +177,7 @@ save_kable(
   extinction_table,
   paste(
     plot_dir,
-    "extinctions.pdf",
+    "extinctions.html", ##### Saved as HTML here as Kbale is mad
     sep = "/"
   )
 )
@@ -188,7 +198,7 @@ host_final_parent_task_data <- summary_data %>%
     CurUpdate_AND_in_host_parent_org_counts,
     CurUpdate_EQU_in_host_parent_org_counts,
     CurUpdate_NAND_in_host_parent_org_counts,
-    # CurUpdate_NOR_in_host_parent_org_counts,
+    CurUpdate_NOR_in_host_parent_org_counts,
     CurUpdate_NOT_in_host_parent_org_counts,
     CurUpdate_OR_NOT_in_host_parent_org_counts,
     CurUpdate_OR_in_host_parent_org_counts,
@@ -200,7 +210,7 @@ host_final_parent_task_data <- summary_data %>%
       CurUpdate_AND_in_host_parent_org_counts,
       CurUpdate_EQU_in_host_parent_org_counts,
       CurUpdate_NAND_in_host_parent_org_counts,
-      # CurUpdate_NOR_in_host_parent_org_counts,
+      CurUpdate_NOR_in_host_parent_org_counts,
       CurUpdate_NOT_in_host_parent_org_counts,
       CurUpdate_OR_NOT_in_host_parent_org_counts,
       CurUpdate_OR_in_host_parent_org_counts,
@@ -276,7 +286,7 @@ host_over_time_parent_task_data <- time_data %>%
     CurUpdate_AND_in_host_parent_org_counts,
     CurUpdate_EQU_in_host_parent_org_counts,
     CurUpdate_NAND_in_host_parent_org_counts,
-    # CurUpdate_NOR_in_host_parent_org_counts,
+    CurUpdate_NOR_in_host_parent_org_counts,
     CurUpdate_NOT_in_host_parent_org_counts,
     CurUpdate_OR_NOT_in_host_parent_org_counts,
     CurUpdate_OR_in_host_parent_org_counts,
@@ -288,7 +298,7 @@ host_over_time_parent_task_data <- time_data %>%
       CurUpdate_AND_in_host_parent_org_counts,
       CurUpdate_EQU_in_host_parent_org_counts,
       CurUpdate_NAND_in_host_parent_org_counts,
-      # CurUpdate_NOR_in_host_parent_org_counts,
+      CurUpdate_NOR_in_host_parent_org_counts,
       CurUpdate_NOT_in_host_parent_org_counts,
       CurUpdate_OR_NOT_in_host_parent_org_counts,
       CurUpdate_OR_in_host_parent_org_counts,
@@ -464,7 +474,7 @@ over_time_sym_parent_task_data <- time_data %>%
     CurUpdate_AND_in_sym_parent_org_counts,
     CurUpdate_EQU_in_sym_parent_org_counts,
     CurUpdate_NAND_in_sym_parent_org_counts,
-    # CurUpdate_NOR_in_sym_parent_org_counts,
+    CurUpdate_NOR_in_sym_parent_org_counts,
     CurUpdate_NOT_in_sym_parent_org_counts,
     CurUpdate_OR_NOT_in_sym_parent_org_counts,
     CurUpdate_OR_in_sym_parent_org_counts,
@@ -476,7 +486,7 @@ over_time_sym_parent_task_data <- time_data %>%
       CurUpdate_AND_in_sym_parent_org_counts,
       CurUpdate_EQU_in_sym_parent_org_counts,
       CurUpdate_NAND_in_sym_parent_org_counts,
-      # CurUpdate_NOR_in_sym_parent_org_counts,
+      CurUpdate_NOR_in_sym_parent_org_counts,
       CurUpdate_NOT_in_sym_parent_org_counts,
       CurUpdate_OR_NOT_in_sym_parent_org_counts,
       CurUpdate_OR_in_sym_parent_org_counts,
