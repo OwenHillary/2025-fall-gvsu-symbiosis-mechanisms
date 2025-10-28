@@ -35,7 +35,7 @@ theme_set(theme_cowplot())
 # Create directory to save plots
 plot_dir <- paste(
   working_directory,
-  "plots3-HstSteal",
+  "plots",
   sep = "/"
 )
 
@@ -80,9 +80,9 @@ summary_data <- summary_data %>%
   ) %>%
   mutate(
     treatment = paste0(
-      "NSP=", NUTRIENT_STEAL_PROP, 
-      "Hrepo=", HOST_MIN_CYCLES_BEFORE_REPRO
-      #"Srepo=", SYM_MIN_CYCLES_BEFORE_REPRO
+      "NSP=", NUTRIENT_STEAL_PROP,
+      "Hrepo=", HOST_MIN_CYCLES_BEFORE_REPRO,
+      "Srepo=", SYM_MIN_CYCLES_BEFORE_REPRO
     )
   ) %>%
   mutate(
@@ -106,14 +106,14 @@ time_data <- time_data %>%
   mutate(
     SEED = as.factor(SEED),
     HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO),
-    # SYM_MIN_CYCLES_BEFORE_REPRO = as.factor(SYM_MIN_CYCLES_BEFORE_REPRO),
+    SYM_MIN_CYCLES_BEFORE_REPRO = as.factor(SYM_MIN_CYCLES_BEFORE_REPRO),
     NUTRIENT_STEAL_PROP = as.factor(NUTRIENT_STEAL_PROP),
   ) %>%
   mutate(
     treatment = paste0(
       "NSP=", NUTRIENT_STEAL_PROP,
-      "Hrepo=", HOST_MIN_CYCLES_BEFORE_REPRO
-      # "Srepo=", SYM_MIN_CYCLES_BEFORE_REPRO
+      "Hrepo=", HOST_MIN_CYCLES_BEFORE_REPRO,
+      "Srepo=", SYM_MIN_CYCLES_BEFORE_REPRO
     )
   ) %>%
   mutate(
