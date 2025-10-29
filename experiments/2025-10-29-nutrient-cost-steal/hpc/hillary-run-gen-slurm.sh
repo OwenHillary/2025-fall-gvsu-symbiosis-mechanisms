@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 REPLICATES=30
-EXP_SLUG=2025-10-25-nutrient-parasite-lifespan-steal
+EXP_SLUG=2025-10-25-nutrient-cost-steal
 SEED_OFFSET=5000
 JOB_TIME=24:00:00
 JOB_MEM=8G
