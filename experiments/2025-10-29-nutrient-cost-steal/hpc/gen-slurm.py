@@ -77,7 +77,7 @@ special_decorators = [
 
 combos.register_var("NUTRIENT_STEAL_PROP")
 combos.register_var("HOST_MIN_CYCLES_BEFORE_REPRO")
-combos.register_var("SYM_MIN_CYCLES_BEFORE_REPRO")
+combos.register_var("HOST_REPRO_RES")
 
 
 combos.add_val(
@@ -91,7 +91,7 @@ combos.add_val(
 )
 
 combos.add_val(
-    "HOST_REPRO_RES",
+    "HOST_REPRO_RES"
     ["20","40", "80", "160"]
 )
 
