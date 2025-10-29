@@ -91,7 +91,7 @@ combos.add_val(
 )
 
 combos.add_val(
-    "HOST_REPRO_RES"
+    "HOST_REPRO_RES",
     ["20","40", "80", "160"]
 )
 
