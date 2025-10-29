@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 REPLICATES=30
-EXP_SLUG=2025-10-25-nutrient-cost-steal
+EXP_SLUG=2025-10-29-nutrient-cost-steal
 SEED_OFFSET=5000
-JOB_TIME=24:00:00
+JOB_TIME=8:00:00
 JOB_MEM=8G
 PROJECT_NAME=2025-fall-gvsu-symbiosis-mechanisms 
 RUNS_PER_SUBDIR=1100
