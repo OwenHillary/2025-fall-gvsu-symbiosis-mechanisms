@@ -2,7 +2,7 @@
 
 REPLICATES=30
 EXP_SLUG=2025-10-31-nutrient-repotime-stealmult
-SEED_OFFSET=5000
+SEED_OFFSET=7000
 JOB_TIME=8:00:00
 JOB_MEM=8G
 PROJECT_NAME=2025-fall-gvsu-symbiosis-mechanisms 
