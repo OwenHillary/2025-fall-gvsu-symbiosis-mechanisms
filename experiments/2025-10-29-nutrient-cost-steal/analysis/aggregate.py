@@ -59,7 +59,8 @@ run_cfg_fields_summary = {
     "SEED",
     "NUTRIENT_STEAL_PROP",
     "PARASITE_BASE_TASK_VALUE_PROP",
-    "NUTRIENT_INTERACTION_MULTIPLIER"
+    "NUTRIENT_INTERACTION_MULTIPLIER",
+    "SYM_MIN_CYCLES_BEFORE_REPRO"
 }
 
 # This is what vars we want to track
@@ -67,7 +68,8 @@ run_cfg_fields_time_series = {
     "SEED", 
     "NUTRIENT_STEAL_PROP",
     "HOST_MIN_CYCLES_BEFORE_REPRO",
-    "SYM_MIN_CYCLES_BEFORE_REPRO"
+    "HOST_REPRO_RES"
+    
 }
 
 org_counts_fields_time_series = {
