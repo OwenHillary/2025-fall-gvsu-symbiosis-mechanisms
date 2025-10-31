@@ -76,7 +76,7 @@ special_decorators = [
 
 
 combos.register_var("repo_time__COPY_OVER")
-combos.register_var("NUTRIENT_STEAL_PROP")
+combos.register_var("NUTRIENT_INTERACTION_MULTIPLIER")
 combos.register_var("NUTRIENT_STEAL_PROP")
 
 combos.add_val(
