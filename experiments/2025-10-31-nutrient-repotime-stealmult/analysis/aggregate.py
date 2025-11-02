@@ -59,6 +59,8 @@ run_cfg_fields_summary = {
     
     # Nutrient Vars 
     "ENABLE_NUTRIENT",
+    "NUTRIENT_STEAL_PROP",
+    "NUTRIENT_INTERACTION_MULTIPLIER",
     "PARASITE_BASE_TASK_VALUE_PROP",
 
     # Feilds I use often
@@ -68,7 +70,6 @@ run_cfg_fields_summary = {
     "SYM_MIN_CYCLES_BEFORE_REPRO",
     
     "SEED"
-
 }
 
 sym_int_vals_fields_summary = {
