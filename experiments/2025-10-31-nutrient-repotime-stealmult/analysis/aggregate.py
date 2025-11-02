@@ -31,8 +31,8 @@ run_cfg_fields_summary = {
     "GRID",
     "OUSTING",
     "SYM_VERT_TRANS_RES",
-    "ENABLE_STRESS",
-    "STRESS_TYPE",
+
+    # Health Vars 
     "ENABLE_HEALTH",
     "HEALTH_TYPE",
     "PARASITE_CYCLE_LOSS_PROP",
@@ -41,23 +41,34 @@ run_cfg_fields_summary = {
     "PARASITE_BASE_CYCLE_PROP",
     "MUTUALIST_CYCLE_DONATE_MULTIPLIER",
     "MUTUALIST_CYCLE_GAIN_PROP",
-    "ENABLE_NUTRIENT",
     "HOST_ONLY_FIRST_TASK_CREDIT",
     "SYM_ONLY_FIRST_TASK_CREDIT",
     "SGP_MUT_PER_BIT_RATE",
     "VT_TASK_MATCH",
     "CYCLES_PER_UPDATE",
-    "HOST_MIN_CYCLES_BEFORE_REPRO",
-    "SYM_MIN_CYCLES_BEFORE_REPRO",
-    "HOST_REPRO_RES",
-    "SYM_HORIZ_TRANS_RES",
+    "START_MOI",
+    "SYM_INT",
+
+    # Stress Vars
+    "ENABLE_STRESS",
+    "STRESS_TYPE",
     "STRESS_FREQUENCY",
     "PARASITE_DEATH_CHANCE",
     "PARASITE_NUM_OFFSPRING_ON_STRESS_INTERACTION",
-    "START_MOI",
     "BASE_DEATH_CHANCE",
-    "SYM_INT",
+    
+    # Nutrient Vars 
+    "ENABLE_NUTRIENT",
+    "PARASITE_BASE_TASK_VALUE_PROP",
+
+    # Feilds I use often
+    "HOST_REPRO_RES",
+    "SYM_HORIZ_TRANS_RES",
+    "HOST_MIN_CYCLES_BEFORE_REPRO",
+    "SYM_MIN_CYCLES_BEFORE_REPRO",
+    
     "SEED"
+
 }
 
 sym_int_vals_fields_summary = {
@@ -66,9 +77,11 @@ sym_int_vals_fields_summary = {
 
 run_cfg_fields_time_series = {
     "SEED",
-    "VERTICAL_TRANSMISSION",
-    "MUTUALIST_CYCLE_DONATE_MULTIPLIER",
-    "PARASITE_CYCLE_STEAL_MULTIPLIER"
+    "HOST_MIN_CYCLES_BEFORE_REPRO",
+    "SYM_MIN_CYCLES_BEFORE_REPRO",
+    "NUTRIENT_STEAL_PROP",
+    "NUTRIENT_INTERACTION_MULTIPLIER",
+
 }
 
 org_counts_fields_time_series = {
