@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 REPLICATES=30
-EXP_SLUG=2025-11-11-nutrient-maxlife
+EXP_SLUG=2025-11-12-nutrient-maxlife-mean
 SEED_OFFSET=11000
 JOB_TIME=8:00:00
 JOB_MEM=8G
