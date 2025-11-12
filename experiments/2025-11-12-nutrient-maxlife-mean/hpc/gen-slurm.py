@@ -76,7 +76,7 @@ special_decorators = [
 # "NUTRIENT_STEAL_PROP": "0.5",
 
 
-combos.register_var("HOST_MIN_CYCLES_BEFORE_REPRO")
+combos.register_var("MAX_CYCLES__COPY_OVER")
 combos.register_var("HOST_REPRO_RES")
 
 
