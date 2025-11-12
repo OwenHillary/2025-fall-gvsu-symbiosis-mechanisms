@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 REPLICATES=30
-EXP_SLUG=2025-11-04-nutrient-repocost-time
-SEED_OFFSET=7000
+EXP_SLUG=2025-11-11-nutrient-maxlife
+SEED_OFFSET=9000
 JOB_TIME=8:00:00
 JOB_MEM=8G
 PROJECT_NAME=2025-fall-gvsu-symbiosis-mechanisms 
