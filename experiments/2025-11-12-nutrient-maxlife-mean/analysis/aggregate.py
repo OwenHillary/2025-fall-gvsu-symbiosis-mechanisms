@@ -68,6 +68,7 @@ run_cfg_fields_summary = {
     "SYM_HORIZ_TRANS_RES",
     "HOST_MIN_CYCLES_BEFORE_REPRO",
     "SYM_MIN_CYCLES_BEFORE_REPRO",
+    "HOST_AGE_MAX",
     
     "SEED"
 }
@@ -79,7 +80,9 @@ sym_int_vals_fields_summary = {
 run_cfg_fields_time_series = {
     "SEED",
     "HOST_MIN_CYCLES_BEFORE_REPRO",
-    "HOST_REPRO_RES"    
+    "HOST_REPRO_RES",
+    "HOST_AGE_MAX"
+
 }
 
 org_counts_fields_time_series = {
