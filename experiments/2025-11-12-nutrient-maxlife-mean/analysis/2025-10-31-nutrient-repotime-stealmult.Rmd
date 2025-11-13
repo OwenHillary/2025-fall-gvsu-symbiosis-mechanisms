@@ -18,7 +18,7 @@ library(viridis)
 ```{r}
 # Build relative path from R's working directory to what is actually the working
 # directory for this experiment.
-experiment_slug <- "2025-11-11-nutrient-maxlife-mean"
+experiment_slug <- "2025-11-12-nutrient-maxlife-mean"
 working_directory <- paste(
   # "2025-fall-gvsu-symbiosis-mechanisms",
   "experiments",
@@ -78,11 +78,13 @@ summary_data <- summary_data %>%
     PARASITE_CYCLE_LOSS_PROP = as.factor(PARASITE_CYCLE_LOSS_PROP),
     HEALTH_INTERACTION_CHANCE = as.factor(HEALTH_INTERACTION_CHANCE),
     PARASITE_CYCLE_STEAL_MULTIPLIER = as.factor(PARASITE_CYCLE_STEAL_MULTIPLIER), # nolint: line_length_linter.
-    PARASITE_BASE_CYCLE_PROP = as.factor(PARASITE_BASE_CYCLE_PROP)
+    PARASITE_BASE_CYCLE_PROP = as.factor(PARASITE_BASE_CYCLE_PROP),
+    HOST_AGE_MAX = as.factor(HOST_AGE_MAX)
   ) %>%
   mutate(
     treatment = paste0(
-      "Time:", HOST_MIN_CYCLES_BEFORE_REPRO,
+      "Life:", HOST_AGE_MAX,
+      " Time:", HOST_MIN_CYCLES_BEFORE_REPRO,
       " Cost:", HOST_REPRO_RES
     )
   ) %>%
@@ -107,11 +109,13 @@ time_data <- time_data %>%
   mutate(
     SEED = as.factor(SEED),
     HOST_REPRO_RES = as.factor(HOST_REPRO_RES),
-    HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO)
+    HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO),
+    HOST_AGE_MAX = as.factor(HOST_AGE_MAX)
   ) %>%
   mutate(
     treatment = paste0(
-      "Time:", HOST_MIN_CYCLES_BEFORE_REPRO,
+      "Life:", HOST_AGE_MAX,
+      " Time:", HOST_MIN_CYCLES_BEFORE_REPRO,
       " Cost:", HOST_REPRO_RES
     )
   ) %>%
@@ -168,7 +172,7 @@ extinctions <- full_join(
 )
 extinctions <- extinctions %>%
   arrange(
-    desc(reps_with_extinct_hosts), desc(reps_with_extinct_syms)
+    desc(reps_with_extinct_syms), desc(reps_with_extinct_hosts)
   )
 extinction_table <- kable(extinctions) %>%
   kable_styling(latex_options = "striped")
