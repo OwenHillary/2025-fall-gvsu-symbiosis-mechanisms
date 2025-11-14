@@ -74,7 +74,7 @@ special_decorators = [
 
 # "HOST_REPRO_RES": "40",
 
-combos.register_var("Host_Sym_Res")
+combos.register_var("Host_Sym_Res__COPY_OVER")
 
 combos.add_val(
     "Host_Sym_Res__COPY_OVER",

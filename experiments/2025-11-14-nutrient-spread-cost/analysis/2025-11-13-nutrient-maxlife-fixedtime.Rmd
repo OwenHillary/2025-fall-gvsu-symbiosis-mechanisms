@@ -18,7 +18,7 @@ library(viridis)
 ```{r}
 # Build relative path from R's working directory to what is actually the working
 # directory for this experiment.
-experiment_slug <- "2025-11-13-nutrient-maxlife-fixedtime"
+experiment_slug <- "2025-11-14-nutrient-spread-cost"
 working_directory <- paste(
   # "2025-fall-gvsu-symbiosis-mechanisms",
   "experiments",
