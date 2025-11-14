@@ -2,7 +2,7 @@
 
 REPLICATES=30
 EXP_SLUG=2025-11-14-nutrient-spread-cost
-SEED_OFFSET=12000
+SEED_OFFSET=13000
 JOB_TIME=8:00:00
 JOB_MEM=8G
 PROJECT_NAME=2025-fall-gvsu-symbiosis-mechanisms 
