@@ -80,8 +80,7 @@ sym_int_vals_fields_summary = {
 run_cfg_fields_time_series = {
     "SEED",
     "HOST_MIN_CYCLES_BEFORE_REPRO",
-    "HOST_REPRO_RES",
-    "HOST_AGE_MAX"
+    "HOST_REPRO_RES"
 
 }
 

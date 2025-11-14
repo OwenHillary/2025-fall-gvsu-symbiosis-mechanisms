@@ -954,3 +954,77 @@ ggsave(
   height = 6
 )
 ```
+
+# Population Over Time
+
+## Sym
+```{r}
+sym_avg_popsize <- time_data %>%
+  group_by(treatment, update) %>%
+  summarize(
+    sym_AVG_popsize = mean(OrgCounts_hosted_sym_count)
+  )
+
+sym_down <- sym_avg_popsize %>% filter(row_number() %% 25 == 1)
+
+
+
+sym_avg_popsize_plt <- ggplot(sym_avg_popsize, aes(x = update, y = sym_AVG_popsize, color = treatment)) +
+  geom_line(data = sym_down, alpha = 0.5) +
+  labs(
+    title = "Avg Syms Popsize over time",
+    x = "Update Number",
+    y = "Sym Count"
+  ) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1
+    )
+  )
+
+ggsave(
+  file = paste(plot_dir, "sym_avg_popsize_plt.pdf", sep = "/"),
+  plot = sym_avg_popsize_plt,
+  width = 20,
+  height = 20
+)
+
+```
+
+
+## Host 
+```{r}
+host_avg_popsize <- time_data %>%
+  group_by(treatment, update) %>%
+  summarize(
+    host_AVG_popsize = mean(OrgCounts_host_count)
+  )
+
+
+host_down <- sym_avg_popsize %>% filter(row_number() %% 25 == 1)
+
+host_avg_popsize_plt <- ggplot(host_avg_popsize, aes(x = update, y = host_AVG_popsize, color = treatment)) +
+  geom_line(data = host_down, alpha = 0.7) +
+  labs(
+    title = "Avg Host Popsize over time",
+    x = "Update Number",
+    y = "Host Count"
+  ) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1
+    )
+  )
+
+ggsave(
+  file = paste(plot_dir, "host_avg_popsize_plt.pdf", sep = "/"),
+  plot = host_avg_popsize_plt,
+  width = 20,
+  height = 20
+)
+
+```

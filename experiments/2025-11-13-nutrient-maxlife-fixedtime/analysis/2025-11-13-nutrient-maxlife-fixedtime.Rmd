@@ -18,7 +18,7 @@ library(viridis)
 ```{r}
 # Build relative path from R's working directory to what is actually the working
 # directory for this experiment.
-experiment_slug <- "2025-11-12-nutrient-maxlife-mean"
+experiment_slug <- "2025-11-13-nutrient-maxlife-fixedtime"
 working_directory <- paste(
   # "2025-fall-gvsu-symbiosis-mechanisms",
   "experiments",
@@ -811,25 +811,26 @@ ggsave(
 
 
 
+# Population Over Time
 
-This is my atempt to make my own R graph
-
-
+## Sym
 ```{r}
-avg_or_data <- time_data %>%
+sym_avg_popsize <- time_data %>%
   group_by(treatment, update) %>%
   summarize(
-    avg_OR_parent = mean(CurUpdate_OR_NOT_in_sym_parent_org_counts)
+    sym_AVG_popsize = mean(OrgCounts_hosted_sym_count)
   )
 
+sym_down <- sym_avg_popsize %>% filter(row_number() %% 25 == 1)
 
-avg_or_data_plt <- ggplot(avg_or_data, aes(x = update, y = avg_OR_parent, color = treatment)) +
-  geom_point(alpha = 0.7) +
-  geom_line() +
+
+
+sym_avg_popsize_plt <- ggplot(sym_avg_popsize, aes(x = update, y = sym_AVG_popsize, color = treatment)) +
+  geom_line(data = sym_down, alpha = 0.5) +
   labs(
-    title = "Average 'OR' Completed by Parent Over Time",
+    title = "Avg Syms Popsize over time",
     x = "Update Number",
-    y = "Avg Or"
+    y = "Sym Count"
   ) +
   theme(
     legend.position = "none",
@@ -840,8 +841,8 @@ avg_or_data_plt <- ggplot(avg_or_data, aes(x = update, y = avg_OR_parent, color 
   )
 
 ggsave(
-  file = paste(plot_dir, "host_parent_or_not_by_time_plt.pdf", sep = "/"),
-  plot = avg_or_data_plt,
+  file = paste(plot_dir, "sym_avg_popsize_plt.pdf", sep = "/"),
+  plot = sym_avg_popsize_plt,
   width = 20,
   height = 20
 )
@@ -849,108 +850,36 @@ ggsave(
 ```
 
 
-Time 100 Cost 160 - Overtime graph - host
-
+## Host 
 ```{r}
-treatment_data <- time_data %>%
-  filter(treatment == "Time:100 Cost:160")
-
-# Pivot tasks to long format
-tasks_long <- treatment_data %>%
-  select(update,
-        CurUpdate_AND_NOT_in_host_parent_org_counts,
-        CurUpdate_AND_in_host_parent_org_counts,
-        CurUpdate_EQU_in_host_parent_org_counts,
-        CurUpdate_NAND_in_host_parent_org_counts,
-        CurUpdate_NOR_in_host_parent_org_counts,
-        CurUpdate_NOT_in_host_parent_org_counts,
-        CurUpdate_OR_NOT_in_host_parent_org_counts,
-        CurUpdate_OR_in_host_parent_org_counts,
-        CurUpdate_XOR_in_host_parent_org_counts
-        ) %>%
-  pivot_longer(
-    cols = starts_with("CurUpdate"),
-    names_to = "task",
-    values_to = "count"
+host_avg_popsize <- time_data %>%
+  group_by(treatment, update) %>%
+  summarize(
+    host_AVG_popsize = mean(OrgCounts_host_count)
   )
 
-# Average over replicates
-tasks_avg <- tasks_long %>%
-  group_by(update, task) %>%
-  summarize(avg_count = mean(count, na.rm = TRUE), .groups = "drop")
+host_down <- sym_avg_popsize %>% filter(row_number() %% 25 == 1)
 
-# Create the plot
-avg_task_plot <- ggplot(tasks_avg, aes(x = update, y = avg_count, color = task)) +
-  geom_line(alpha = 0.5) +
+host_avg_popsize_plt <- ggplot(host_avg_popsize, aes(x = update, y = host_AVG_popsize, color = treatment)) +
+  geom_line(data = host_down, alpha = 0.7) +
   labs(
-    title = "Average Task Counts Over Time (Time=100, Cost=160)",
+    title = "Avg Host Popsize over time",
     x = "Update Number",
-    y = "Average Count",
-    color = "Task"
+    y = "Host Count"
   ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Save as PDF
-ggsave(
-  file = file.path(plot_dir, "avg_task_time100_cost160.pdf"),
-  plot = avg_task_plot,
-  width = 10,
-  height = 6
-)
-```
-
-
-
-
-Time 100 Cost 160 - Overtime graph - sym
-
-```{r}
-treatment_data <- time_data %>%
-  filter(treatment == "Time:100 Cost:160")
-
-# Pivot tasks to long format
-tasks_long <- treatment_data %>%
-  select(update,
-        CurUpdate_AND_NOT_in_sym_parent_org_counts,
-        CurUpdate_AND_in_sym_parent_org_counts,
-        CurUpdate_EQU_in_sym_parent_org_counts,
-        CurUpdate_NAND_in_sym_parent_org_counts,
-        CurUpdate_NOR_in_sym_parent_org_counts,
-        CurUpdate_NOT_in_sym_parent_org_counts,
-        CurUpdate_OR_NOT_in_sym_parent_org_counts,
-        CurUpdate_OR_in_sym_parent_org_counts,
-        CurUpdate_XOR_in_sym_parent_org_counts
-        ) %>%
-  pivot_longer(
-    cols = starts_with("CurUpdate"),
-    names_to = "task",
-    values_to = "count"
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1
+    )
   )
 
-# Average over replicates
-tasks_avg <- tasks_long %>%
-  group_by(update, task) %>%
-  summarize(avg_count = mean(count, na.rm = TRUE), .groups = "drop")
-
-# Create the plot
-avg_task_plot <- ggplot(tasks_avg, aes(x = update, y = avg_count, color = task)) +
-  geom_line(alpha = 0.5) +
-  labs(
-    title = "Average Task Counts Over Time (Time=100, Cost=160)",
-    x = "Update Number",
-    y = "Average Count",
-    color = "Task"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-
-# Save as PDF
 ggsave(
-  file = file.path(plot_dir, "avg_task_time100_cost160_sym.pdf"),
-  plot = avg_task_plot,
-  width = 10,
-  height = 6
+  file = paste(plot_dir, "host_avg_popsize_plt.pdf", sep = "/"),
+  plot = host_avg_popsize_plt,
+  width = 20,
+  height = 20
 )
+
 ```
