@@ -119,6 +119,27 @@ cur_update_info_fields_time_series = {
     "EQU_in_sym_parent_org_counts"
 }
 
+tasks_file_fields_time_series = {
+    "host_task_NOT",
+    "host_task_NAND",
+    "host_task_OR_NOT",
+    "host_task_AND",
+    "host_task_OR",
+    "host_task_AND_NOT",
+    "host_task_NOR",
+    "host_task_XOR",
+    "host_task_EQU",
+    "sym_task_NOT",
+    "sym_task_NAND",
+    "sym_task_OR_NOT",
+    "sym_task_AND",
+    "sym_task_OR",
+    "sym_task_AND_NOT",
+    "sym_task_NOR",
+    "sym_task_XOR",
+    "sym_task_EQU"
+}
+
 transmission_rates_fields_time_series = {
 
 }
@@ -329,6 +350,34 @@ def main():
                 run_data = cur_update_info_data,
                 fields = cur_update_info_fields_time_series,
                 prefix = "CurUpdate"
+            )
+
+
+        ########################################
+        # Extract data from Tasks.csv
+        ########################################
+        tasks_path = os.path.join(run_path, "output", "Tasks.csv")
+        tasks_data = utils.read_csv(tasks_path)
+
+        # Extract summary info
+        tasks_fields = set(tasks_data[0].keys())
+        tasks_fields.remove("update")
+        run_summary_info.update(
+            extract_summary_data(
+                data = tasks_data,
+                target_update = run_target_update,
+                fields = tasks_fields,
+                prefix = "Tasks"
+            )
+        )
+
+        # Extract time series info
+        if run_finished_target:
+            add_time_series_info(
+                time_series_data = time_series_info,
+                run_data = tasks_data,
+                fields = tasks_file_fields_time_series,
+                prefix = "Tasks"
             )
 
         ########################################
