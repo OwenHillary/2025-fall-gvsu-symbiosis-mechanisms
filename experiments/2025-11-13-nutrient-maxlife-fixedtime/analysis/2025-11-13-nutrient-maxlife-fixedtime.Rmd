@@ -1,4 +1,4 @@
-# 2025-09-25 - Health parasites
+# 2025-11-13
 
 ## Dependencies and setup
 
@@ -110,11 +110,10 @@ time_data <- time_data %>%
     SEED = as.factor(SEED),
     HOST_REPRO_RES = as.factor(HOST_REPRO_RES),
     HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO),
-    HOST_AGE_MAX = as.factor(HOST_AGE_MAX)
+    
   ) %>%
   mutate(
     treatment = paste0(
-      "Life:", HOST_AGE_MAX,
       " Time:", HOST_MIN_CYCLES_BEFORE_REPRO,
       " Cost:", HOST_REPRO_RES
     )
