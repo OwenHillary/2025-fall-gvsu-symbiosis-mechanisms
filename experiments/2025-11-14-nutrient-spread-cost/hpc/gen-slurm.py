@@ -60,12 +60,11 @@ fixed_parameters = {
     # Important 
     "SYM_MIN_CYCLES_BEFORE_REPRO": "10",  
     "HOST_MIN_CYCLES_BEFORE_REPRO": "100",
-    "SYM_HORIZ_TRANS_RES": "20",
-    
-    "HOST_AGE_MAX": "320",
-    "NUTRIENT_INTERACTION_MULTIPLIER": "7",
-    "PARASITE_BASE_TASK_VALUE_PROP": "0.2",
-    "NUTRIENT_STEAL_PROP": "1"
+
+    "HOST_AGE_MAX": "-1",
+    "NUTRIENT_INTERACTION_MULTIPLIER": "8",
+    "PARASITE_BASE_TASK_VALUE_PROP": "1",
+    "NUTRIENT_STEAL_PROP": ".8"
 }
 
 special_decorators = [
