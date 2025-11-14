@@ -58,7 +58,8 @@ fixed_parameters = {
     "START_MOI": "1",
     
     # Important 
-    "SYM_MIN_CYCLES_BEFORE_REPRO": "25",  
+    "SYM_MIN_CYCLES_BEFORE_REPRO": "10",  
+    "HOST_MIN_CYCLES_BEFORE_REPRO": "100",
     "SYM_HORIZ_TRANS_RES": "20",
     
     "HOST_AGE_MAX": "320",
@@ -72,27 +73,21 @@ special_decorators = [
 ]
 
 # "HOST_REPRO_RES": "40",
-# "HOST_MIN_CYCLES_BEFORE_REPRO": "200",
 
-
-
-combos.register_var("HOST_MIN_CYCLES_BEFORE_REPRO")
-combos.register_var("HOST_REPRO_RES")
-
+combos.register_var("Host_Sym_Res")
 
 combos.add_val(
-    "HOST_MIN_CYCLES_BEFORE_REPRO",
-    ["18", "36", "72"]
+    "Host_Sym_Res__COPY_OVER",
+    [
+        "-HOST_REPRO_RES 5 -SYM_REPRO_RES 2.5",
+        "-HOST_REPRO_RES 20 -SYM_REPRO_RES 10",
+        "-HOST_REPRO_RES 30 -SYM_REPRO_RES 15",
+        "-HOST_REPRO_RES 40 -SYM_REPRO_RES 20",
+        "-HOST_REPRO_RES 50 -SYM_REPRO_RES 25",
+        "-HOST_REPRO_RES 100 -SYM_REPRO_RES 50",
+        "-HOST_REPRO_RES 300 -SYM_REPRO_RES 150"
+    ]
 )
-
-combos.add_val(
-    "HOST_REPRO_RES",
-    ["20","40", "80"]
-)
-
-
-
-"repo_time__COPY_OVER"
 
 def main():
     # Configure command line arguments
