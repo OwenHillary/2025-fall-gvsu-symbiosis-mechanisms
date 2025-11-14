@@ -1,0 +1,884 @@
+# 2025-11-13
+
+## Dependencies and setup
+
+```{r}
+library(tidyverse)
+library(cowplot)
+library(RColorBrewer)
+library(khroma)
+library(rstatix)
+library(knitr)
+library(kableExtra)
+library(viridis)
+
+# library(webshot2)
+```
+
+```{r}
+# Build relative path from R's working directory to what is actually the working
+# directory for this experiment.
+experiment_slug <- "2025-11-13-nutrient-maxlife-fixedtime"
+working_directory <- paste(
+  # "2025-fall-gvsu-symbiosis-mechanisms",
+  "experiments",
+  experiment_slug,
+  "analysis",
+  sep = "/"
+)
+
+```
+
+```{r}
+# Use the cowplot theme as our default for ggplots
+theme_set(theme_cowplot())
+# Create directory to save plots
+plot_dir <- paste(
+  working_directory,
+  "plots",
+  sep = "/"
+)
+
+
+dir.create(
+  plot_dir,
+  showWarnings = FALSE
+)
+```
+
+### Load and preprocess data
+
+```{r}
+tasks <- c("NOT", "NAND", "OR_NOT", "AND", "OR", "AND_NOT", "NOR", "XOR", "EQU")
+max_pop_size <- 80 * 80
+threshold <- 0.025 * max_pop_size
+```
+
+Load summary data.
+
+```{r}
+summary_data_path <- paste(
+  working_directory,
+  "data",
+  "summary.csv",
+  sep = "/"
+)
+summary_data <- read_csv(summary_data_path)
+# Do any universal preprocessing
+summary_data <- summary_data %>%
+  mutate(
+    SEED = as.factor(SEED),
+    HOST_REPRO_RES = as.factor(HOST_REPRO_RES),
+    HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO),
+    SYM_MIN_CYCLES_BEFORE_REPRO = as.factor(SYM_MIN_CYCLES_BEFORE_REPRO),
+    NUTRIENT_STEAL_PROP = as.factor(NUTRIENT_STEAL_PROP),
+    NUTRIENT_INTERACTION_MULTIPLIER=as.factor(NUTRIENT_INTERACTION_MULTIPLIER),
+    START_MOI = as.factor(START_MOI),
+    HEALTH_TYPE = as.factor(HEALTH_TYPE),
+    PARASITE_CYCLE_LOSS_PROP = as.factor(PARASITE_CYCLE_LOSS_PROP),
+    HEALTH_INTERACTION_CHANCE = as.factor(HEALTH_INTERACTION_CHANCE),
+    PARASITE_CYCLE_STEAL_MULTIPLIER = as.factor(PARASITE_CYCLE_STEAL_MULTIPLIER), # nolint: line_length_linter.
+    PARASITE_BASE_CYCLE_PROP = as.factor(PARASITE_BASE_CYCLE_PROP),
+    HOST_AGE_MAX = as.factor(HOST_AGE_MAX)
+  ) %>%
+  mutate(
+    treatment = paste0(
+      "Life:", HOST_AGE_MAX,
+      " Time:", HOST_MIN_CYCLES_BEFORE_REPRO,
+      " Cost:", HOST_REPRO_RES
+    )
+  ) %>%
+  mutate(
+    treatment = as.factor(treatment)
+  )
+```
+
+Load time series data.
+
+```{r}
+time_data_path <- paste(
+  working_directory,
+  "data",
+  "time_series.csv",
+  sep = "/"
+)
+time_data <- read_csv(time_data_path)
+
+# Do any universal preprocessing
+time_data <- time_data %>%
+  mutate(
+    SEED = as.factor(SEED),
+    HOST_REPRO_RES = as.factor(HOST_REPRO_RES),
+    HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO),
+    
+  ) %>%
+  mutate(
+    treatment = paste0(
+      " Time:", HOST_MIN_CYCLES_BEFORE_REPRO,
+      " Cost:", HOST_REPRO_RES
+    )
+  ) %>%
+  mutate(
+    treatment = as.factor(treatment)
+  )
+```
+
+
+## Which runs had hosts and/or symbiont populations that went extinct?
+
+```{r}
+sym_min_pop_sizes <- time_data %>%
+  group_by(SEED) %>%
+  slice_min(
+    OrgCounts_hosted_sym_count,
+    n = 1
+  ) %>%
+  slice_min(
+    update,
+    n = 1
+  )
+
+reps_with_extinct_syms <- sym_min_pop_sizes %>%
+  group_by(
+    treatment
+  ) %>%
+  summarize(
+    reps_with_extinct_syms = sum(OrgCounts_hosted_sym_count == 0)
+  )
+
+host_min_pop_sizes <- time_data %>%
+  group_by(SEED) %>%
+  slice_min(
+    OrgCounts_host_count,
+    n = 1
+  ) %>%
+  slice_min(
+    update,
+    n = 1
+  )
+
+reps_with_extinct_hosts <- host_min_pop_sizes %>%
+  group_by(
+    treatment
+  ) %>%
+  summarize(
+    reps_with_extinct_hosts = sum(OrgCounts_host_count == 0)
+  )
+
+extinctions <- full_join(
+  reps_with_extinct_syms,
+  reps_with_extinct_hosts
+)
+extinctions <- extinctions %>%
+  arrange(
+    desc(reps_with_extinct_syms), desc(reps_with_extinct_hosts)
+  )
+extinction_table <- kable(extinctions) %>%
+  kable_styling(latex_options = "striped")
+save_kable(
+  extinction_table,
+  paste(
+    plot_dir,
+    "extinctions.html", ##### Saved as HTML here as Kbale is mad
+    sep = "/"
+  )
+)
+```
+
+## Final task performance
+
+### Using tasks completed by parents - Hosts
+
+```{r}
+# Pivot task data long:
+# 1) Select only relevant columns
+host_final_parent_task_data <- summary_data %>%
+  select(
+    SEED,
+    treatment,
+    CurUpdate_AND_NOT_in_host_parent_org_counts,
+    CurUpdate_AND_in_host_parent_org_counts,
+    CurUpdate_EQU_in_host_parent_org_counts,
+    CurUpdate_NAND_in_host_parent_org_counts,
+    CurUpdate_NOR_in_host_parent_org_counts,
+    CurUpdate_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_in_host_parent_org_counts,
+    CurUpdate_XOR_in_host_parent_org_counts
+  ) %>%
+  pivot_longer(
+    c(
+      CurUpdate_AND_NOT_in_host_parent_org_counts,
+      CurUpdate_AND_in_host_parent_org_counts,
+      CurUpdate_EQU_in_host_parent_org_counts,
+      CurUpdate_NAND_in_host_parent_org_counts,
+      CurUpdate_NOR_in_host_parent_org_counts,
+      CurUpdate_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_in_host_parent_org_counts,
+      CurUpdate_XOR_in_host_parent_org_counts
+    ),
+    names_to = "task",
+    values_to = "task_in_parent_count"
+  ) %>%
+  mutate(
+    task = str_replace(task, "CurUpdate_", "")
+  ) %>%
+  mutate(
+    task = str_replace(task, "_in_host_parent_org_counts", "")
+  ) %>%
+  mutate(
+    task_completed_by_parent = task_in_parent_count >= threshold,
+    task = factor(
+      task,
+      levels = tasks,
+      labels = tasks
+    )
+  )
+
+host_final_parent_task_done <- host_final_parent_task_data %>%
+  group_by(
+    treatment,
+    task
+  ) %>%
+  summarize(
+    total_reps = n(),
+    tasks_completed_by_parent = sum(task_completed_by_parent == TRUE)
+  )
+```
+
+```{r}
+host_final_parent_task_done_plt <- host_final_parent_task_done %>%
+  ggplot(
+    aes(x = treatment, color = treatment, fill = treatment, y = tasks_completed_by_parent)
+  ) +
+  geom_col(alpha = 0.5) +
+  scale_x_discrete() +
+  facet_wrap(~task) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
+  )
+ggsave(
+  file = paste(plot_dir, "host_final_parent_task_done_plt.pdf", sep = "/"),
+  plot = host_final_parent_task_done_plt,
+  width = 30,
+  height = 20
+)
+```
+
+
+### SYM
+
+```{r}
+# Pivot task data long:
+# 1) Select only relevant columns
+sym_final_parent_task_data <- summary_data %>%
+  select(
+    SEED,
+    treatment,
+    CurUpdate_AND_NOT_in_sym_parent_org_counts,
+    CurUpdate_AND_in_sym_parent_org_counts,
+    CurUpdate_EQU_in_sym_parent_org_counts,
+    CurUpdate_NAND_in_sym_parent_org_counts,
+    CurUpdate_NOR_in_sym_parent_org_counts,
+    CurUpdate_NOT_in_sym_parent_org_counts,
+    CurUpdate_OR_NOT_in_sym_parent_org_counts,
+    CurUpdate_OR_in_sym_parent_org_counts,
+    CurUpdate_XOR_in_sym_parent_org_counts
+  ) %>%
+  pivot_longer(
+    c(
+      CurUpdate_AND_NOT_in_sym_parent_org_counts,
+      CurUpdate_AND_in_sym_parent_org_counts,
+      CurUpdate_EQU_in_sym_parent_org_counts,
+      CurUpdate_NAND_in_sym_parent_org_counts,
+      CurUpdate_NOR_in_sym_parent_org_counts,
+      CurUpdate_NOT_in_sym_parent_org_counts,
+      CurUpdate_OR_NOT_in_sym_parent_org_counts,
+      CurUpdate_OR_in_sym_parent_org_counts,
+      CurUpdate_XOR_in_sym_parent_org_counts
+    ),
+    names_to = "task",
+    values_to = "task_in_parent_count"
+  ) %>%
+  mutate(
+    task = str_replace(task, "CurUpdate_", "")
+  ) %>%
+  mutate(
+    task = str_replace(task, "_in_sym_parent_org_counts", "")
+  ) %>%
+  mutate(
+    task_completed_by_parent = task_in_parent_count >= threshold,
+    task = factor(
+      task,
+      levels = tasks,
+      labels = tasks
+    )
+  )
+
+sym_final_parent_task_done <- sym_final_parent_task_data %>%
+  group_by(
+    treatment,
+    task
+  ) %>%
+  summarize(
+    total_reps = n(),
+    tasks_completed_by_parent = sum(task_completed_by_parent == TRUE)
+  )
+```
+
+```{r}
+sym_final_parent_task_done_plt <- sym_final_parent_task_done %>%
+  ggplot(
+    aes(x = treatment, color = treatment, fill = treatment, y = tasks_completed_by_parent)
+  ) +
+  geom_col(alpha = 0.5) +
+  scale_x_discrete() +
+  facet_wrap(~task) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
+  )
+ggsave(
+  file = paste(plot_dir, "sym_final_parent_task_done_plt.pdf", sep = "/"),
+  plot = sym_final_parent_task_done_plt,
+  width = 30,
+  height = 20
+)
+```
+
+
+## Task performance all time
+
+### Hosts
+
+Quantify whether tasks have been performed over course of entire run.
+
+```{r}
+# Pivot task data long:
+# 1) Select only relevant columns
+host_over_time_parent_task_data <- time_data %>%
+  select(
+    SEED,
+    treatment,
+    update,
+    CurUpdate_AND_NOT_in_host_parent_org_counts,
+    CurUpdate_AND_in_host_parent_org_counts,
+    CurUpdate_EQU_in_host_parent_org_counts,
+    CurUpdate_NAND_in_host_parent_org_counts,
+    CurUpdate_NOR_in_host_parent_org_counts,
+    CurUpdate_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_in_host_parent_org_counts,
+    CurUpdate_XOR_in_host_parent_org_counts
+  ) %>%
+  pivot_longer(
+    c(
+      CurUpdate_AND_NOT_in_host_parent_org_counts,
+      CurUpdate_AND_in_host_parent_org_counts,
+      CurUpdate_EQU_in_host_parent_org_counts,
+      CurUpdate_NAND_in_host_parent_org_counts,
+      CurUpdate_NOR_in_host_parent_org_counts,
+      CurUpdate_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_in_host_parent_org_counts,
+      CurUpdate_XOR_in_host_parent_org_counts
+    ),
+    names_to = "task",
+    values_to = "task_in_parent_count"
+  ) %>%
+  mutate(
+    task = str_replace(task, "CurUpdate_", "")
+  ) %>%
+  mutate(
+    task = str_replace(task, "_in_host_parent_org_counts", "")
+  ) %>%
+  mutate(
+    task_completed_by_parent = task_in_parent_count >= threshold,
+    task = factor(
+      task,
+      levels = tasks,
+      labels = tasks
+    )
+  )
+
+host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
+  # filter(update <= 100000) %>%
+  group_by(
+    SEED,
+    treatment,
+    task
+    
+  ) %>%
+  summarize(
+    n = n(),
+    parent_task_completed_ever = any(task_completed_by_parent)
+  ) %>%
+  ungroup() %>%
+  group_by(
+    treatment,
+    task
+    
+  ) %>%
+  summarize(
+    n = n(),
+    parent_tasks_completed_ever = sum(parent_task_completed_ever == TRUE)
+  )
+
+# parent_tasks_all_time_total <- parent_tasks_all_time_by_task %>%
+
+```
+
+```{r}
+host_parent_tasks_all_time_by_task_plt <- host_parent_tasks_all_time_by_task %>%
+  ggplot(
+    aes(x = treatment, color = treatment, fill = treatment, y = parent_tasks_completed_ever)
+  ) +
+  geom_col(alpha = 0.5) +
+  scale_x_discrete() +
+  facet_wrap(~task) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1
+    )
+  )
+ggsave(
+  file = paste(plot_dir, "host_parent_tasks_all_time_by_task_plt.pdf", sep = "/"),
+  plot = host_parent_tasks_all_time_by_task_plt,
+  width = 20,
+  height = 20
+)
+```
+
+Total different tasks (all time)
+
+```{r}
+host_total_different_parent_tasks_all_time <- host_over_time_parent_task_data %>%
+  group_by(
+    SEED,
+    treatment,
+    task
+
+  ) %>%
+  # Summarize across updates whether task was ever completed by a parent.
+  summarize(
+    n = n(),
+    parent_task_completed_ever = any(task_completed_by_parent)
+  ) %>%
+  ungroup() %>%
+  group_by(
+    SEED,
+    treatment
+  ) %>%
+  # Summarize across tasks (by seed)
+  summarize(
+    n = n(),
+    num_parent_tasks_completed_ever = sum(parent_task_completed_ever == TRUE)
+  )
+```
+
+```{r}
+host_total_different_parent_tasks_all_time_plt <- host_total_different_parent_tasks_all_time %>%
+  ggplot(
+    aes(x = treatment, fill = treatment, y = num_parent_tasks_completed_ever)
+  ) +
+  geom_point(
+    mapping=aes(color = treatment),
+    position = position_jitter(width = .15),
+    size = .5,
+    alpha = 0.8
+  ) +
+  geom_boxplot(
+    width = .1,
+    outlier.shape = NA,
+    alpha = 0.5
+  ) +
+  scale_x_discrete() +
+  scale_y_continuous(
+    limits = c(-0.5, 10),
+    breaks = seq(0, 9, 1)
+  ) +
+
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 30,
+      hjust = 1
+    )
+  )
+ggsave(
+  file = paste(plot_dir, "host_total_different_parent_tasks_all_time_plt.pdf", sep = "/"),
+  plot = host_total_different_parent_tasks_all_time_plt,
+  width = 30,
+  height = 25
+)
+```
+
+
+Average number of different tasks evolved?
+
+```{r}
+host_avg_tasks_table <- host_total_different_parent_tasks_all_time %>%
+  group_by(treatment) %>%
+  summarize(avg_diff_num_host_parent_tasks = mean(num_parent_tasks_completed_ever)) %>%
+  arrange(desc(avg_diff_num_host_parent_tasks)) %>%
+  kable() %>%
+  kable_styling(latex_options = "striped")
+
+host_avg_tasks_table
+# save_kable(
+#   host_avg_tasks_table,
+#   paste(
+#     plot_dir,
+#     "host_avg_diff_num_host_parent_tasks.html",
+#     sep = "/"
+#   )
+# )
+```
+
+### Symbionts
+
+Quantify whether tasks have been performed over course of entire run.
+
+```{r}
+# Pivot task data long:
+# 1) Select only relevant columns
+over_time_sym_parent_task_data <- time_data %>%
+  select(
+    SEED,
+    treatment,
+    update,
+    CurUpdate_AND_NOT_in_sym_parent_org_counts,
+    CurUpdate_AND_in_sym_parent_org_counts,
+    CurUpdate_EQU_in_sym_parent_org_counts,
+    CurUpdate_NAND_in_sym_parent_org_counts,
+    CurUpdate_NOR_in_sym_parent_org_counts,
+    CurUpdate_NOT_in_sym_parent_org_counts,
+    CurUpdate_OR_NOT_in_sym_parent_org_counts,
+    CurUpdate_OR_in_sym_parent_org_counts,
+    CurUpdate_XOR_in_sym_parent_org_counts
+  ) %>%
+  pivot_longer(
+    c(
+      CurUpdate_AND_NOT_in_sym_parent_org_counts,
+      CurUpdate_AND_in_sym_parent_org_counts,
+      CurUpdate_EQU_in_sym_parent_org_counts,
+      CurUpdate_NAND_in_sym_parent_org_counts,
+      CurUpdate_NOR_in_sym_parent_org_counts,
+      CurUpdate_NOT_in_sym_parent_org_counts,
+      CurUpdate_OR_NOT_in_sym_parent_org_counts,
+      CurUpdate_OR_in_sym_parent_org_counts,
+      CurUpdate_XOR_in_sym_parent_org_counts
+    ),
+    names_to = "task",
+    values_to = "task_in_parent_count"
+  ) %>%
+  mutate(
+    task = str_replace(task, "CurUpdate_", "")
+  ) %>%
+  mutate(
+    task = str_replace(task, "_in_sym_parent_org_counts", "")
+  ) %>%
+  mutate(
+    task_completed_by_parent = task_in_parent_count >= threshold,
+    task = factor(
+      task,
+      levels = tasks,
+      labels = tasks
+    )
+  )
+
+sym_parent_tasks_all_time_by_task <- over_time_sym_parent_task_data %>%
+  group_by(
+    SEED,
+    treatment,
+    task
+  ) %>%
+  summarize(
+    n = n(),
+    parent_task_completed_ever = any(task_completed_by_parent)
+  ) %>%
+  ungroup() %>%
+  group_by(
+    treatment,
+    task
+  ) %>%
+  summarize(
+    n = n(),
+    parent_tasks_completed_ever = sum(parent_task_completed_ever == TRUE)
+  )
+
+# parent_tasks_all_time_total <- parent_tasks_all_time_by_task %>%
+
+```
+
+```{r}
+sym_parent_tasks_all_time_by_task_plt <- sym_parent_tasks_all_time_by_task %>%
+  ggplot(
+    aes(x = treatment, color = treatment, fill = treatment, y = parent_tasks_completed_ever)
+  ) +
+  geom_col(alpha = 0.5) +
+  scale_x_discrete() +
+  facet_wrap(~task) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 65,
+      hjust = 1
+    )
+  )
+ggsave(
+  file = paste(plot_dir, "sym_parent_tasks_all_time_by_task_plt.pdf", sep = "/"),
+  plot = sym_parent_tasks_all_time_by_task_plt,
+  width = 20,
+  height = 20
+)
+```
+
+Total different tasks (all time)
+
+```{r}
+total_different_sym_parent_tasks_all_time <- over_time_sym_parent_task_data %>%
+  group_by(
+    SEED,
+    treatment,
+    task
+  ) %>%
+  # Summarize across updates whether task was ever completed by a parent.
+  summarize(
+    n = n(),
+    parent_task_completed_ever = any(task_completed_by_parent)
+  ) %>%
+  ungroup() %>%
+  group_by(
+    SEED,
+    treatment
+
+  ) %>%
+  # Summarize across tasks (by seed)
+  summarize(
+    n = n(),
+    num_parent_tasks_completed_ever = sum(parent_task_completed_ever == TRUE)
+  )
+```
+
+```{r}
+total_different_sym_parent_tasks_all_time_plt <- total_different_sym_parent_tasks_all_time %>%
+  ggplot(
+    aes(x = treatment, fill = treatment, y = num_parent_tasks_completed_ever)
+  ) +
+  geom_point(
+    mapping=aes(color = treatment),
+    position = position_jitter(width = .15),
+    size = .5,
+    alpha = 0.8
+  ) +
+  geom_boxplot(
+    width = .1,
+    outlier.shape = NA,
+    alpha = 0.5
+  ) +
+  scale_x_discrete() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 30,
+      hjust = 1
+    )
+  )
+ggsave(
+  file = paste(plot_dir, "total_different_sym_parent_tasks_all_time_plt.pdf", sep = "/"),
+  plot = total_different_sym_parent_tasks_all_time_plt,
+  width = 25,
+  height = 20
+)
+```
+
+Average number of different tasks evolved?
+
+```{r}
+sym_avg_tasks_table <- total_different_sym_parent_tasks_all_time %>%
+  group_by(treatment) %>%
+  summarize(avg_diff_num_sym_parent_tasks = mean(num_parent_tasks_completed_ever)) %>%
+  arrange(desc(avg_diff_num_sym_parent_tasks)) %>%
+  kable() %>%
+  kable_styling(latex_options = "striped")
+# save_kable(
+#   sym_avg_tasks_table,
+#   paste(
+#     plot_dir,
+#     "sym_avg_diff_num_parent_tasks.pdf",
+#     sep = "/"
+#   )
+# )
+```
+
+## Population size
+
+Average / median population size
+
+```{r}
+pop_size_summary <- time_data %>%
+  group_by(
+    SEED,
+    treatment
+  ) %>%
+  summarize(
+    host_pop_size_avg = mean(OrgCounts_host_count),
+    host_pop_size_median = median(OrgCounts_host_count),
+    host_pop_size_variance = var(OrgCounts_host_count),
+    sym_pop_size_avg = mean(OrgCounts_hosted_sym_count),
+    sym_pop_size_median = median(OrgCounts_hosted_sym_count),
+    sym_pop_size_variance = var(OrgCounts_hosted_sym_count)
+  )
+```
+
+```{r}
+host_pop_size_avg_plt <- pop_size_summary %>%
+  ggplot(
+    aes(x = treatment, fill = treatment, y = host_pop_size_avg)
+  ) +
+  geom_point(
+    mapping=aes(color = treatment),
+    position = position_jitter(width = .05),
+    size = .5,
+    alpha = 0.8
+  ) +
+  geom_boxplot(
+    width = .1,
+    outlier.shape = NA,
+    alpha = 0.5
+  ) +
+  scale_x_discrete() +
+  # facet_wrap(STRESS_FREQUENCY~stress_death_chance, labeller = label_both) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 60,
+      hjust = 1
+    )
+  )
+ggsave(
+  file = paste(plot_dir, "host_pop_size_avg_plt.pdf", sep = "/"),
+  plot = host_pop_size_avg_plt,
+  width = 10,
+  height = 10
+)
+```
+
+```{r}
+host_pop_size_variance_plt <- pop_size_summary %>%
+  ggplot(
+    aes(x = treatment, fill = treatment, y = host_pop_size_variance)
+  ) +
+  geom_point(
+    mapping=aes(color = treatment),
+    position = position_jitter(width = .15),
+    size = .5,
+    alpha = 0.8
+  ) +
+  geom_boxplot(
+    width = .1,
+    outlier.shape = NA,
+    alpha = 0.5
+  ) +
+  scale_x_discrete() +
+  # facet_wrap(STRESS_FREQUENCY~stress_death_chance, labeller = label_both) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 60,
+      hjust = 1
+    )
+  )
+ggsave(
+  file = paste(plot_dir, "host_pop_size_variance_plt.pdf", sep = "/"),
+  plot = host_pop_size_variance_plt,
+  width = 10,
+  height = 10
+)
+```
+
+
+
+# Population Over Time
+
+## Sym
+```{r}
+sym_avg_popsize <- time_data %>%
+  group_by(treatment, update) %>%
+  summarize(
+    sym_AVG_popsize = mean(OrgCounts_hosted_sym_count)
+  )
+
+sym_down <- sym_avg_popsize %>% filter(row_number() %% 25 == 1)
+
+
+
+sym_avg_popsize_plt <- ggplot(sym_avg_popsize, aes(x = update, y = sym_AVG_popsize, color = treatment)) +
+  geom_line(data = sym_down, alpha = 0.5) +
+  labs(
+    title = "Avg Syms Popsize over time",
+    x = "Update Number",
+    y = "Sym Count"
+  ) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1
+    )
+  )
+
+ggsave(
+  file = paste(plot_dir, "sym_avg_popsize_plt.pdf", sep = "/"),
+  plot = sym_avg_popsize_plt,
+  width = 20,
+  height = 20
+)
+
+```
+
+
+## Host 
+```{r}
+host_avg_popsize <- time_data %>%
+  group_by(treatment, update) %>%
+  summarize(
+    host_AVG_popsize = mean(OrgCounts_host_count)
+  )
+
+host_down <- sym_avg_popsize %>% filter(row_number() %% 25 == 1)
+
+host_avg_popsize_plt <- ggplot(host_avg_popsize, aes(x = update, y = host_AVG_popsize, color = treatment)) +
+  geom_line(data = host_down, alpha = 0.7) +
+  labs(
+    title = "Avg Host Popsize over time",
+    x = "Update Number",
+    y = "Host Count"
+  ) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1
+    )
+  )
+
+ggsave(
+  file = paste(plot_dir, "host_avg_popsize_plt.pdf", sep = "/"),
+  plot = host_avg_popsize_plt,
+  width = 20,
+  height = 20
+)
+
+```
