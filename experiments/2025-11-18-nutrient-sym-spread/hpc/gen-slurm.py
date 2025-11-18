@@ -77,7 +77,7 @@ combos.register_var("SYM_HORIZ_TRANS_RES")
 
 combos.add_val(
     "SYM_HORIZ_TRANS_RES",
-    ["1, 2.5, 5, 8, 10, 15, 20, 30, 80"]
+    ["1", "2.5", "5", "8", "10", "15", "20", "30", "80"]
 )
 
 def main():
