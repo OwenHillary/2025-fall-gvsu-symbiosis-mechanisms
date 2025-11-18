@@ -80,7 +80,6 @@ sym_int_vals_fields_summary = {
 run_cfg_fields_time_series = {
     "SEED",
     
-    "HOST_REPRO_RES",
     "SYM_HORIZ_TRANS_RES",
 }
 
