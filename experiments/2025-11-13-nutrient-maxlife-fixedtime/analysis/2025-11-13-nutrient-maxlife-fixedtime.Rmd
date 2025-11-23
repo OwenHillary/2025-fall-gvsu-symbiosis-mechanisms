@@ -11,7 +11,10 @@ library(rstatix)
 library(knitr)
 library(kableExtra)
 library(viridis)
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
 # library(webshot2)
 ```
 
@@ -20,13 +23,19 @@ library(viridis)
 # directory for this experiment.
 experiment_slug <- "2025-11-13-nutrient-maxlife-fixedtime"
 working_directory <- paste(
+<<<<<<< HEAD
   # "2025-fall-gvsu-symbiosis-mechanisms",
+=======
+>>>>>>> main
   "experiments",
   experiment_slug,
   "analysis",
   sep = "/"
 )
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
 ```
 
 ```{r}
@@ -38,8 +47,11 @@ plot_dir <- paste(
   "plots",
   sep = "/"
 )
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> main
 dir.create(
   plot_dir,
   showWarnings = FALSE
@@ -50,6 +62,7 @@ dir.create(
 
 ```{r}
 tasks <- c("NOT", "NAND", "OR_NOT", "AND", "OR", "AND_NOT", "NOR", "XOR", "EQU")
+<<<<<<< HEAD
 max_pop_size <- 80 * 80
 threshold <- 0.025 * max_pop_size
 ```
@@ -92,6 +105,12 @@ summary_data <- summary_data %>%
     treatment = as.factor(treatment)
   )
 ```
+=======
+max_pop_size <- 100 * 100
+threshold <- 0.025 * max_pop_size
+```
+
+>>>>>>> main
 
 Load time series data.
 
@@ -108,6 +127,7 @@ time_data <- read_csv(time_data_path)
 time_data <- time_data %>%
   mutate(
     SEED = as.factor(SEED),
+<<<<<<< HEAD
     HOST_REPRO_RES = as.factor(HOST_REPRO_RES),
     HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO),
     
@@ -120,6 +140,21 @@ time_data <- time_data %>%
   ) %>%
   mutate(
     treatment = as.factor(treatment)
+=======
+    HOST_MIN_CYCLES_BEFORE_REPRO = as.factor(HOST_MIN_CYCLES_BEFORE_REPRO),
+    HOST_REPRO_RES = as.factor(HOST_REPRO_RES)
+  ) %>%
+  mutate(
+    treatment = paste0(
+      "MC=", HOST_MIN_CYCLES_BEFORE_REPRO,
+      "_RES=", HOST_REPRO_RES
+    )
+  ) %>%
+  mutate(
+    treatment = as.factor(
+      treatment
+    )
+>>>>>>> main
   )
 ```
 
@@ -171,7 +206,11 @@ extinctions <- full_join(
 )
 extinctions <- extinctions %>%
   arrange(
+<<<<<<< HEAD
     desc(reps_with_extinct_syms), desc(reps_with_extinct_hosts)
+=======
+    desc(reps_with_extinct_hosts), desc(reps_with_extinct_syms)
+>>>>>>> main
   )
 extinction_table <- kable(extinctions) %>%
   kable_styling(latex_options = "striped")
@@ -179,12 +218,17 @@ save_kable(
   extinction_table,
   paste(
     plot_dir,
+<<<<<<< HEAD
     "extinctions.html", ##### Saved as HTML here as Kbale is mad
+=======
+    "extinctions.pdf",
+>>>>>>> main
     sep = "/"
   )
 )
 ```
 
+<<<<<<< HEAD
 ## Final task performance
 
 ### Using tasks completed by parents - Hosts
@@ -355,6 +399,8 @@ ggsave(
 ```
 
 
+=======
+>>>>>>> main
 ## Task performance all time
 
 ### Hosts
@@ -368,6 +414,7 @@ host_over_time_parent_task_data <- time_data %>%
   select(
     SEED,
     treatment,
+<<<<<<< HEAD
     update,
     CurUpdate_AND_NOT_in_host_parent_org_counts,
     CurUpdate_AND_in_host_parent_org_counts,
@@ -390,15 +437,45 @@ host_over_time_parent_task_data <- time_data %>%
       CurUpdate_OR_NOT_in_host_parent_org_counts,
       CurUpdate_OR_in_host_parent_org_counts,
       CurUpdate_XOR_in_host_parent_org_counts
+=======
+    HOST_MIN_CYCLES_BEFORE_REPRO,
+    HOST_REPRO_RES,
+    update,
+    Tasks_host_task_AND_NOT,
+    Tasks_host_task_AND,
+    Tasks_host_task_EQU,
+    Tasks_host_task_NAND,
+    Tasks_host_task_NOR,
+    Tasks_host_task_NOT,
+    Tasks_host_task_OR_NOT,
+    Tasks_host_task_OR,
+    Tasks_host_task_XOR
+  ) %>%
+  pivot_longer(
+    c(
+      Tasks_host_task_AND_NOT,
+      Tasks_host_task_AND,
+      Tasks_host_task_EQU,
+      Tasks_host_task_NAND,
+      Tasks_host_task_NOR,
+      Tasks_host_task_NOT,
+      Tasks_host_task_OR_NOT,
+      Tasks_host_task_OR,
+      Tasks_host_task_XOR
+>>>>>>> main
     ),
     names_to = "task",
     values_to = "task_in_parent_count"
   ) %>%
   mutate(
+<<<<<<< HEAD
     task = str_replace(task, "CurUpdate_", "")
   ) %>%
   mutate(
     task = str_replace(task, "_in_host_parent_org_counts", "")
+=======
+    task = str_replace(task, "Tasks_host_task_", "")
+>>>>>>> main
   ) %>%
   mutate(
     task_completed_by_parent = task_in_parent_count >= threshold,
@@ -414,8 +491,14 @@ host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
   group_by(
     SEED,
     treatment,
+<<<<<<< HEAD
     task
     
+=======
+    HOST_MIN_CYCLES_BEFORE_REPRO,
+    HOST_REPRO_RES,
+    task
+>>>>>>> main
   ) %>%
   summarize(
     n = n(),
@@ -424,8 +507,14 @@ host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
   ungroup() %>%
   group_by(
     treatment,
+<<<<<<< HEAD
     task
     
+=======
+    HOST_MIN_CYCLES_BEFORE_REPRO,
+    HOST_REPRO_RES,
+    task
+>>>>>>> main
   ) %>%
   summarize(
     n = n(),
@@ -437,6 +526,7 @@ host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
 ```
 
 ```{r}
+<<<<<<< HEAD
 host_parent_tasks_all_time_by_task_plt <- host_parent_tasks_all_time_by_task %>%
   ggplot(
     aes(x = treatment, color = treatment, fill = treatment, y = parent_tasks_completed_ever)
@@ -446,6 +536,39 @@ host_parent_tasks_all_time_by_task_plt <- host_parent_tasks_all_time_by_task %>%
   facet_wrap(~task) +
   theme(
     legend.position = "none",
+=======
+
+host_parent_tasks_all_time_by_task_plt <- host_parent_tasks_all_time_by_task %>%
+  ggplot(
+    aes(
+      x = task,
+      color = task,
+      fill = task,
+      y = parent_tasks_completed_ever
+    )
+  ) +
+  geom_col(
+    position = "dodge",
+    alpha = 0.5
+  ) +
+  geom_text(
+    aes(label = parent_tasks_completed_ever),
+    position = position_dodge(width = 1),
+    vjust = -0.5,
+    size = 2
+  ) +
+  scale_x_discrete() +
+  scale_y_continuous(
+    limits = c(0, 31)
+  ) +
+  facet_grid(
+    HOST_MIN_CYCLES_BEFORE_REPRO ~ HOST_REPRO_RES,
+    axes = "all_x",
+    labeller = label_both
+  ) +
+  theme(
+    legend.position = "bottom",
+>>>>>>> main
     axis.text.x = element_text(
       angle = 90,
       hjust = 1
@@ -454,6 +577,7 @@ host_parent_tasks_all_time_by_task_plt <- host_parent_tasks_all_time_by_task %>%
 ggsave(
   file = paste(plot_dir, "host_parent_tasks_all_time_by_task_plt.pdf", sep = "/"),
   plot = host_parent_tasks_all_time_by_task_plt,
+<<<<<<< HEAD
   width = 20,
   height = 20
 )
@@ -545,6 +669,13 @@ host_avg_tasks_table
 # )
 ```
 
+=======
+  width = 15,
+  height = 15
+)
+```
+
+>>>>>>> main
 ### Symbionts
 
 Quantify whether tasks have been performed over course of entire run.
@@ -556,6 +687,7 @@ over_time_sym_parent_task_data <- time_data %>%
   select(
     SEED,
     treatment,
+<<<<<<< HEAD
     update,
     CurUpdate_AND_NOT_in_sym_parent_org_counts,
     CurUpdate_AND_in_sym_parent_org_counts,
@@ -578,15 +710,45 @@ over_time_sym_parent_task_data <- time_data %>%
       CurUpdate_OR_NOT_in_sym_parent_org_counts,
       CurUpdate_OR_in_sym_parent_org_counts,
       CurUpdate_XOR_in_sym_parent_org_counts
+=======
+    HOST_MIN_CYCLES_BEFORE_REPRO,
+    HOST_REPRO_RES,
+    update,
+    Tasks_sym_task_AND_NOT,
+    Tasks_sym_task_AND,
+    Tasks_sym_task_EQU,
+    Tasks_sym_task_NAND,
+    Tasks_sym_task_NOR,
+    Tasks_sym_task_NOT,
+    Tasks_sym_task_OR_NOT,
+    Tasks_sym_task_OR,
+    Tasks_sym_task_XOR
+  ) %>%
+  pivot_longer(
+    c(
+      Tasks_sym_task_AND_NOT,
+      Tasks_sym_task_AND,
+      Tasks_sym_task_EQU,
+      Tasks_sym_task_NAND,
+      Tasks_sym_task_NOR,
+      Tasks_sym_task_NOT,
+      Tasks_sym_task_OR_NOT,
+      Tasks_sym_task_OR,
+      Tasks_sym_task_XOR
+>>>>>>> main
     ),
     names_to = "task",
     values_to = "task_in_parent_count"
   ) %>%
   mutate(
+<<<<<<< HEAD
     task = str_replace(task, "CurUpdate_", "")
   ) %>%
   mutate(
     task = str_replace(task, "_in_sym_parent_org_counts", "")
+=======
+    task = str_replace(task, "Tasks_sym_task_", "")
+>>>>>>> main
   ) %>%
   mutate(
     task_completed_by_parent = task_in_parent_count >= threshold,
@@ -597,10 +759,19 @@ over_time_sym_parent_task_data <- time_data %>%
     )
   )
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 sym_parent_tasks_all_time_by_task <- over_time_sym_parent_task_data %>%
   group_by(
     SEED,
     treatment,
+<<<<<<< HEAD
+=======
+    HOST_MIN_CYCLES_BEFORE_REPRO,
+    HOST_REPRO_RES,
+>>>>>>> main
     task
   ) %>%
   summarize(
@@ -610,6 +781,11 @@ sym_parent_tasks_all_time_by_task <- over_time_sym_parent_task_data %>%
   ungroup() %>%
   group_by(
     treatment,
+<<<<<<< HEAD
+=======
+    HOST_MIN_CYCLES_BEFORE_REPRO,
+    HOST_REPRO_RES,
+>>>>>>> main
     task
   ) %>%
   summarize(
@@ -622,6 +798,7 @@ sym_parent_tasks_all_time_by_task <- over_time_sym_parent_task_data %>%
 ```
 
 ```{r}
+<<<<<<< HEAD
 sym_parent_tasks_all_time_by_task_plt <- sym_parent_tasks_all_time_by_task %>%
   ggplot(
     aes(x = treatment, color = treatment, fill = treatment, y = parent_tasks_completed_ever)
@@ -633,12 +810,48 @@ sym_parent_tasks_all_time_by_task_plt <- sym_parent_tasks_all_time_by_task %>%
     legend.position = "none",
     axis.text.x = element_text(
       angle = 65,
+=======
+
+sym_parent_tasks_all_time_by_task_plt <- sym_parent_tasks_all_time_by_task %>%
+  ggplot(
+    aes(
+      x = task,
+      color = task,
+      fill = task,
+      y = parent_tasks_completed_ever
+    )
+  ) +
+  geom_col(
+    position = "dodge",
+    alpha = 0.5
+  ) +
+  geom_text(
+    aes(label = parent_tasks_completed_ever),
+    position = position_dodge(width = 1),
+    vjust = -0.5,
+    size = 2
+  ) +
+  scale_x_discrete() +
+  scale_y_continuous(
+    limits = c(0, 31)
+  ) +
+  facet_grid(
+    HOST_MIN_CYCLES_BEFORE_REPRO ~ HOST_REPRO_RES,
+    axes = "all_x",
+    labeller = label_both
+  ) +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(
+      angle = 90,
+>>>>>>> main
       hjust = 1
     )
   )
 ggsave(
   file = paste(plot_dir, "sym_parent_tasks_all_time_by_task_plt.pdf", sep = "/"),
   plot = sym_parent_tasks_all_time_by_task_plt,
+<<<<<<< HEAD
   width = 20,
   height = 20
 )
@@ -721,6 +934,13 @@ sym_avg_tasks_table <- total_different_sym_parent_tasks_all_time %>%
 #   )
 # )
 ```
+=======
+  width = 15,
+  height = 15
+)
+```
+
+>>>>>>> main
 
 ## Population size
 
@@ -749,7 +969,11 @@ host_pop_size_avg_plt <- pop_size_summary %>%
   ) +
   geom_point(
     mapping=aes(color = treatment),
+<<<<<<< HEAD
     position = position_jitter(width = .05),
+=======
+    position = position_jitter(width = .15),
+>>>>>>> main
     size = .5,
     alpha = 0.8
   ) +
@@ -808,6 +1032,7 @@ ggsave(
 )
 ```
 
+<<<<<<< HEAD
 
 
 # Population Over Time
@@ -881,4 +1106,76 @@ ggsave(
   height = 20
 )
 
+=======
+## Phenotypic diversity
+
+### Final update
+
+```{r}
+summary_data <- summary_data %>%
+  mutate(
+    only_credit_first = case_when(
+      task_credit == "H0S0" ~ "Neither",
+      task_credit == "H0S1" ~ "Symbionts",
+      task_credit == "H1S0" ~ "Hosts",
+      task_credit == "H1S1" ~ "Both"
+    )
+  ) %>%
+  mutate(
+    only_credit_first = as.factor(only_credit_first)
+  ) %>%
+  mutate(
+    sym_condition = factor(
+      sym_condition,
+      levels = c(
+        "no-syms",
+        "parasite",
+        "mutualist"
+      )
+    )
+  )
+host_parent_phenotypic_entropy_plt <- summary_data %>%
+  ggplot(
+    aes(
+      x = sym_condition,
+      color = sym_condition,
+      fill = sym_condition,
+      y = CurUpdate_host_parent_entropy_task_sets
+    )
+  ) +
+  geom_point(
+    mapping=aes(color = sym_condition),
+    position = position_jitter(width = .15),
+    size = .5,
+    alpha = 0.8
+  ) +
+  geom_boxplot(
+    width = .1,
+    outlier.shape = NA,
+    alpha = 0.5
+  ) +
+  scale_color_bright() +
+  scale_fill_bright() +
+  scale_x_discrete() +
+  facet_grid(
+    interaction_multiplier ~ only_credit_first,
+    axes = "all_y",
+    scales = "free",
+    labeller = label_both
+  ) +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1
+    ),
+    panel.border = element_rect(colour = "black")
+  )
+ggsave(
+  file = paste(plot_dir, "host_parent_phenotypic_entropy_plt.pdf", sep = "/"),
+  plot = host_parent_phenotypic_entropy_plt,
+  width = 15,
+  height = 15
+)
+>>>>>>> main
 ```

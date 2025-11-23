@@ -51,7 +51,11 @@ dir.create(
 ```{r}
 tasks <- c("NOT", "NAND", "OR_NOT", "AND", "OR", "AND_NOT", "NOR", "XOR", "EQU")
 max_pop_size <- 80 * 80
+<<<<<<< HEAD
 threshold <- 0.025 * max_pop_size
+=======
+threshold <- 0.01 * max_pop_size
+>>>>>>> main
 ```
 
 Load summary data.
@@ -82,8 +86,11 @@ summary_data <- summary_data %>%
     HOST_AGE_MAX = as.factor(HOST_AGE_MAX),
     SYM_HORIZ_TRANS_RES = as.factor(SYM_HORIZ_TRANS_RES),
     SYM_HORIZ_TRANS_RES_num = as.numeric(SYM_HORIZ_TRANS_RES)
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> main
   ) %>%
   mutate(
     treatment = paste0(
@@ -115,7 +122,11 @@ time_data <- time_data %>%
     SEED = as.factor(SEED),
     SYM_HORIZ_TRANS_RES_num = as.numeric(SYM_HORIZ_TRANS_RES),
     SYM_HORIZ_TRANS_RES = as.factor(SYM_HORIZ_TRANS_RES),
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> main
   ) %>%
   mutate(
     treatment = paste0(
@@ -186,7 +197,11 @@ save_kable(
   extinction_table,
   paste(
     plot_dir,
+<<<<<<< HEAD
     "extinctions.html", ##### Saved as HTML here as Kbale is mad
+=======
+    "extinctions.pdf", ##### Saved as HTML here as Kbale is mad
+>>>>>>> main
     sep = "/"
   )
 )
@@ -365,6 +380,7 @@ ggsave(
 ## Task performance all time
 
 ### Hosts
+<<<<<<< HEAD
 ```{r}
 # Pivot task data long:
 # 1) Select only relevant columns
@@ -446,6 +462,11 @@ Quantify whether tasks have been performed over course of entire run.
 
 
 #### Number of Task
+=======
+
+Quantify whether tasks have been performed over course of entire run.
+
+>>>>>>> main
 ```{r}
 # Pivot task data long:
 # 1) Select only relevant columns
@@ -497,7 +518,11 @@ host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
     SEED,
     treatment,
     task
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> main
   ) %>%
   summarize(
     n = n(),
@@ -507,7 +532,11 @@ host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
   group_by(
     treatment,
     task
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> main
   ) %>%
   summarize(
     n = n(),
@@ -541,6 +570,7 @@ ggsave(
 )
 ```
 
+<<<<<<< HEAD
 Total different tasks (all time)
 
 ```{r}
@@ -626,6 +656,9 @@ host_avg_tasks_table
 #   )
 # )
 ```
+=======
+
+>>>>>>> main
 
 ### Symbionts
 
@@ -723,6 +756,7 @@ ggsave(
 )
 ```
 
+<<<<<<< HEAD
 Total different tasks (all time)
 
 ```{r}
@@ -799,6 +833,62 @@ sym_avg_tasks_table <- total_different_sym_parent_tasks_all_time %>%
 #     sep = "/"
 #   )
 # )
+=======
+## Task performance over time
+
+```{r}
+over_time_sym_parent_task_data <- over_time_sym_parent_task_data %>%
+  mutate(org_type = "symbiont")
+
+host_over_time_parent_task_data <- host_over_time_parent_task_data %>%
+  mutate(org_type = "host")
+
+over_time_parent_task_data <- full_join(
+  over_time_sym_parent_task_data,
+  host_over_time_parent_task_data
+)
+over_time_parent_task_data <- over_time_parent_task_data %>%
+  mutate(
+    org_type = as.factor(org_type)
+  )
+```
+
+```{r}
+treatments <- levels(over_time_parent_task_data$treatment)
+
+for (trt in treatments) {
+  p <- over_time_parent_task_data %>%
+    filter(treatment == trt) %>%
+    ggplot(
+      aes(
+        x = update,
+        y = task_in_parent_count,
+        color = org_type,
+        fill = org_type
+      )
+    ) +
+    geom_line() +
+    labs(
+      title = trt
+    ) +
+    facet_grid(
+      SEED ~ task,
+      scales = "free_y",
+      labeller = label_both
+    )
+
+  ggsave(
+    file = paste(
+      plot_dir,
+      paste0("tasks_over_time_", trt, ".pdf"),
+      sep = "/"
+    ),
+    plot = p,
+    width = 20,
+    height = 40
+  )
+}
+>>>>>>> main
 ```
 
 ## Population size
@@ -928,7 +1018,11 @@ ggsave(
 ```
 
 
+<<<<<<< HEAD
 ## Host 
+=======
+## Host
+>>>>>>> main
 ```{r}
 host_avg_popsize <- time_data %>%
   group_by(treatment, update) %>%
@@ -960,6 +1054,7 @@ ggsave(
   height = 20
 )
 
+<<<<<<< HEAD
 ```
 
 
@@ -1034,3 +1129,6 @@ ggsave(
 )
 ```
 
+=======
+```
+>>>>>>> main
