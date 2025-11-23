@@ -51,11 +51,7 @@ dir.create(
 ```{r}
 tasks <- c("NOT", "NAND", "OR_NOT", "AND", "OR", "AND_NOT", "NOR", "XOR", "EQU")
 max_pop_size <- 80 * 80
-<<<<<<< HEAD
-threshold <- 0.025 * max_pop_size
-=======
 threshold <- 0.01 * max_pop_size
->>>>>>> main
 ```
 
 Load summary data.
@@ -86,11 +82,6 @@ summary_data <- summary_data %>%
     HOST_AGE_MAX = as.factor(HOST_AGE_MAX),
     SYM_HORIZ_TRANS_RES = as.factor(SYM_HORIZ_TRANS_RES),
     SYM_HORIZ_TRANS_RES_num = as.numeric(SYM_HORIZ_TRANS_RES)
-<<<<<<< HEAD
-
-
-=======
->>>>>>> main
   ) %>%
   mutate(
     treatment = paste0(
@@ -122,11 +113,7 @@ time_data <- time_data %>%
     SEED = as.factor(SEED),
     SYM_HORIZ_TRANS_RES_num = as.numeric(SYM_HORIZ_TRANS_RES),
     SYM_HORIZ_TRANS_RES = as.factor(SYM_HORIZ_TRANS_RES),
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> main
   ) %>%
   mutate(
     treatment = paste0(
@@ -197,11 +184,7 @@ save_kable(
   extinction_table,
   paste(
     plot_dir,
-<<<<<<< HEAD
-    "extinctions.html", ##### Saved as HTML here as Kbale is mad
-=======
     "extinctions.pdf", ##### Saved as HTML here as Kbale is mad
->>>>>>> main
     sep = "/"
   )
 )
@@ -380,93 +363,9 @@ ggsave(
 ## Task performance all time
 
 ### Hosts
-<<<<<<< HEAD
-```{r}
-# Pivot task data long:
-# 1) Select only relevant columns
-host_over_time_parent_task_data <- time_data %>%
-  select(
-    SEED,
-    treatment,
-    update,
-    CurUpdate_AND_NOT_in_host_parent_org_counts,
-    CurUpdate_AND_in_host_parent_org_counts,
-    CurUpdate_EQU_in_host_parent_org_counts,
-    CurUpdate_NAND_in_host_parent_org_counts,
-    CurUpdate_NOR_in_host_parent_org_counts,
-    CurUpdate_NOT_in_host_parent_org_counts,
-    CurUpdate_OR_NOT_in_host_parent_org_counts,
-    CurUpdate_OR_in_host_parent_org_counts,
-    CurUpdate_XOR_in_host_parent_org_counts
-  ) %>%
-  pivot_longer(
-    c(
-      CurUpdate_AND_NOT_in_host_parent_org_counts,
-      CurUpdate_AND_in_host_parent_org_counts,
-      CurUpdate_EQU_in_host_parent_org_counts,
-      CurUpdate_NAND_in_host_parent_org_counts,
-      CurUpdate_NOR_in_host_parent_org_counts,
-      CurUpdate_NOT_in_host_parent_org_counts,
-      CurUpdate_OR_NOT_in_host_parent_org_counts,
-      CurUpdate_OR_in_host_parent_org_counts,
-      CurUpdate_XOR_in_host_parent_org_counts
-    ),
-    names_to = "task",
-    values_to = "task_in_parent_count"
-  ) %>%
-  mutate(
-    task = str_replace(task, "CurUpdate_", "")
-  ) %>%
-  mutate(
-    task = str_replace(task, "_in_host_parent_org_counts", "")
-  ) %>%
-  mutate(
-    task_completed_by_parent = task_in_parent_count >= threshold,
-    task = factor(
-      task,
-      levels = tasks,
-      labels = tasks
-    )
-  )
-
-host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
-  # filter(update <= 100000) %>%
-  group_by(
-    SEED,
-    treatment,
-    task
-    
-  ) %>%
-  summarize(
-    n = n(),
-    parent_task_completed_ever = any(task_completed_by_parent)
-  ) %>%
-  ungroup() %>%
-  group_by(
-    treatment,
-    task
-    
-  ) %>%
-  summarize(
-    n = n(),
-    parent_tasks_completed_ever = sum(parent_task_completed_ever == TRUE)
-  )
-
-# parent_tasks_all_time_total <- parent_tasks_all_time_by_task %>%
-
-```
-Quantify whether tasks have been performed over course of entire run.
-
-#### Parent Org
-
-
-
-#### Number of Task
-=======
 
 Quantify whether tasks have been performed over course of entire run.
 
->>>>>>> main
 ```{r}
 # Pivot task data long:
 # 1) Select only relevant columns
@@ -518,11 +417,7 @@ host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
     SEED,
     treatment,
     task
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> main
   ) %>%
   summarize(
     n = n(),
@@ -532,11 +427,7 @@ host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
   group_by(
     treatment,
     task
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> main
   ) %>%
   summarize(
     n = n(),
@@ -570,95 +461,7 @@ ggsave(
 )
 ```
 
-<<<<<<< HEAD
-Total different tasks (all time)
 
-```{r}
-host_total_different_parent_tasks_all_time <- host_over_time_parent_task_data %>%
-  group_by(
-    SEED,
-    treatment,
-    task
-
-  ) %>%
-  # Summarize across updates whether task was ever completed by a parent.
-  summarize(
-    n = n(),
-    parent_task_completed_ever = any(task_completed_by_parent)
-  ) %>%
-  ungroup() %>%
-  group_by(
-    SEED,
-    treatment
-  ) %>%
-  # Summarize across tasks (by seed)
-  summarize(
-    n = n(),
-    num_parent_tasks_completed_ever = sum(parent_task_completed_ever == TRUE)
-  )
-```
-
-```{r}
-host_total_different_parent_tasks_all_time_plt <- host_total_different_parent_tasks_all_time %>%
-  ggplot(
-    aes(x = treatment, fill = treatment, y = num_parent_tasks_completed_ever)
-  ) +
-  geom_point(
-    mapping=aes(color = treatment),
-    position = position_jitter(width = .15),
-    size = .5,
-    alpha = 0.8
-  ) +
-  geom_boxplot(
-    width = .1,
-    outlier.shape = NA,
-    alpha = 0.5
-  ) +
-  scale_x_discrete() +
-  scale_y_continuous(
-    limits = c(-0.5, 10),
-    breaks = seq(0, 9, 1)
-  ) +
-
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(
-      angle = 30,
-      hjust = 1
-    )
-  )
-ggsave(
-  file = paste(plot_dir, "host_total_different_parent_tasks_all_time_plt.pdf", sep = "/"),
-  plot = host_total_different_parent_tasks_all_time_plt,
-  width = 30,
-  height = 25
-)
-```
-
-
-Average number of different tasks evolved?
-
-```{r}
-host_avg_tasks_table <- host_total_different_parent_tasks_all_time %>%
-  group_by(treatment) %>%
-  summarize(avg_diff_num_host_parent_tasks = mean(num_parent_tasks_completed_ever)) %>%
-  arrange(desc(avg_diff_num_host_parent_tasks)) %>%
-  kable() %>%
-  kable_styling(latex_options = "striped")
-
-host_avg_tasks_table
-# save_kable(
-#   host_avg_tasks_table,
-#   paste(
-#     plot_dir,
-#     "host_avg_diff_num_host_parent_tasks.html",
-#     sep = "/"
-#   )
-# )
-```
-=======
-
->>>>>>> main
 
 ### Symbionts
 
@@ -756,84 +559,6 @@ ggsave(
 )
 ```
 
-<<<<<<< HEAD
-Total different tasks (all time)
-
-```{r}
-total_different_sym_parent_tasks_all_time <- over_time_sym_parent_task_data %>%
-  group_by(
-    SEED,
-    treatment,
-    task
-  ) %>%
-  # Summarize across updates whether task was ever completed by a parent.
-  summarize(
-    n = n(),
-    parent_task_completed_ever = any(task_completed_by_parent)
-  ) %>%
-  ungroup() %>%
-  group_by(
-    SEED,
-    treatment
-
-  ) %>%
-  # Summarize across tasks (by seed)
-  summarize(
-    n = n(),
-    num_parent_tasks_completed_ever = sum(parent_task_completed_ever == TRUE)
-  )
-```
-
-```{r}
-total_different_sym_parent_tasks_all_time_plt <- total_different_sym_parent_tasks_all_time %>%
-  ggplot(
-    aes(x = treatment, fill = treatment, y = num_parent_tasks_completed_ever)
-  ) +
-  geom_point(
-    mapping=aes(color = treatment),
-    position = position_jitter(width = .15),
-    size = .5,
-    alpha = 0.8
-  ) +
-  geom_boxplot(
-    width = .1,
-    outlier.shape = NA,
-    alpha = 0.5
-  ) +
-  scale_x_discrete() +
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(
-      angle = 30,
-      hjust = 1
-    )
-  )
-ggsave(
-  file = paste(plot_dir, "total_different_sym_parent_tasks_all_time_plt.pdf", sep = "/"),
-  plot = total_different_sym_parent_tasks_all_time_plt,
-  width = 25,
-  height = 20
-)
-```
-
-Average number of different tasks evolved?
-
-```{r}
-sym_avg_tasks_table <- total_different_sym_parent_tasks_all_time %>%
-  group_by(treatment) %>%
-  summarize(avg_diff_num_sym_parent_tasks = mean(num_parent_tasks_completed_ever)) %>%
-  arrange(desc(avg_diff_num_sym_parent_tasks)) %>%
-  kable() %>%
-  kable_styling(latex_options = "striped")
-# save_kable(
-#   sym_avg_tasks_table,
-#   paste(
-#     plot_dir,
-#     "sym_avg_diff_num_parent_tasks.pdf",
-#     sep = "/"
-#   )
-# )
-=======
 ## Task performance over time
 
 ```{r}
@@ -888,7 +613,6 @@ for (trt in treatments) {
     height = 40
   )
 }
->>>>>>> main
 ```
 
 ## Population size
@@ -1018,11 +742,7 @@ ggsave(
 ```
 
 
-<<<<<<< HEAD
-## Host 
-=======
 ## Host
->>>>>>> main
 ```{r}
 host_avg_popsize <- time_data %>%
   group_by(treatment, update) %>%
@@ -1054,81 +774,4 @@ ggsave(
   height = 20
 )
 
-<<<<<<< HEAD
 ```
-
-
-
-
-
-
-# Some weird overtime data
-
-```{r}
-# Pivot task data long:
-# 1) Select only relevant columns
-connected <- time_data %>%
-  select(
-    SEED,
-    treatment,
-    update,
-    Tasks_sym_task_AND_NOT,
-    Tasks_sym_task_AND,
-    Tasks_sym_task_EQU,
-    Tasks_sym_task_NAND,
-    Tasks_sym_task_NOR,
-    Tasks_sym_task_NOT,
-    Tasks_sym_task_OR_NOT,
-    Tasks_sym_task_OR,
-    Tasks_sym_task_XOR,
-    Tasks_host_task_AND_NOT,
-    Tasks_host_task_AND,
-    Tasks_host_task_EQU,
-    Tasks_host_task_NAND,
-    Tasks_host_task_NOR,
-    Tasks_host_task_NOT,
-    Tasks_host_task_OR_NOT,
-    Tasks_host_task_OR,
-    Tasks_host_task_XOR
-  )
-
-connected %>%
-  ggplot( aes(x=update, y=n, group=name, color=name)) +
-      geom_line() +
-      scale_color_viridis(discrete = TRUE) +
-      ggtitle("Simiularty between")+
-      theme_ipsum() +
-      ylab("Number of babies born")
-
-
-
-```
-
-
-
-```{r}
-connected_plt <- connected %>%
-  ggplot(
-    aes(x = connected, color = treatment, fill = treatment, y = update)
-  ) +
-  geom_line(alpha = 0.8, linewidth = 1) +
-  scale_x_discrete() +
-  facet_wrap(~task) +
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(
-      angle = 65,
-      hjust = 1
-    )
-  )
-ggsave(
-  file = paste(plot_dir, "Connected.pdf", sep = "/"),
-  plot = connected_plt,
-  width = 20,
-  height = 20
-)
-```
-
-=======
-```
->>>>>>> main
