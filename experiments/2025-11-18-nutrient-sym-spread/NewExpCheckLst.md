@@ -19,22 +19,22 @@ Step 2:  (Changing scripts)
     
 Step 3: (Adding to git, we dont need to add thing 12 times)
 
-    git add exp_name            : 
-    git commit -m "Stuff"       : 
-    git push owen owen          : 
+    git add exp_name            :   +
+    git commit -m "Stuff"       :   +
+    git push owen owen          :   +
 
 Step 4: (HPC side)
 
-    git pull owen owen          : 
-    add symbulation to  config  : 
+    git pull owen owen          :   +
+    add symbulation to  config  :   +
 
 Step 5: (Analysis)
 
     Aggergate:
-        edit time series feild  : 
+        edit time series feild  :   +
 
     R:
-        change EXP_SLUR         : 
+        change EXP_SLUG         :   
         edit factors            : 
 
 
