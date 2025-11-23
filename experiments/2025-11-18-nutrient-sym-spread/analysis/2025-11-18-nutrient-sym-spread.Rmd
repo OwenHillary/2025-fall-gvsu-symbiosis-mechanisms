@@ -365,9 +365,87 @@ ggsave(
 ## Task performance all time
 
 ### Hosts
+```{r}
+# Pivot task data long:
+# 1) Select only relevant columns
+host_over_time_parent_task_data <- time_data %>%
+  select(
+    SEED,
+    treatment,
+    update,
+    CurUpdate_AND_NOT_in_host_parent_org_counts,
+    CurUpdate_AND_in_host_parent_org_counts,
+    CurUpdate_EQU_in_host_parent_org_counts,
+    CurUpdate_NAND_in_host_parent_org_counts,
+    CurUpdate_NOR_in_host_parent_org_counts,
+    CurUpdate_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_in_host_parent_org_counts,
+    CurUpdate_XOR_in_host_parent_org_counts
+  ) %>%
+  pivot_longer(
+    c(
+      CurUpdate_AND_NOT_in_host_parent_org_counts,
+      CurUpdate_AND_in_host_parent_org_counts,
+      CurUpdate_EQU_in_host_parent_org_counts,
+      CurUpdate_NAND_in_host_parent_org_counts,
+      CurUpdate_NOR_in_host_parent_org_counts,
+      CurUpdate_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_in_host_parent_org_counts,
+      CurUpdate_XOR_in_host_parent_org_counts
+    ),
+    names_to = "task",
+    values_to = "task_in_parent_count"
+  ) %>%
+  mutate(
+    task = str_replace(task, "CurUpdate_", "")
+  ) %>%
+  mutate(
+    task = str_replace(task, "_in_host_parent_org_counts", "")
+  ) %>%
+  mutate(
+    task_completed_by_parent = task_in_parent_count >= threshold,
+    task = factor(
+      task,
+      levels = tasks,
+      labels = tasks
+    )
+  )
 
+host_parent_tasks_all_time_by_task <- host_over_time_parent_task_data %>%
+  # filter(update <= 100000) %>%
+  group_by(
+    SEED,
+    treatment,
+    task
+    
+  ) %>%
+  summarize(
+    n = n(),
+    parent_task_completed_ever = any(task_completed_by_parent)
+  ) %>%
+  ungroup() %>%
+  group_by(
+    treatment,
+    task
+    
+  ) %>%
+  summarize(
+    n = n(),
+    parent_tasks_completed_ever = sum(parent_task_completed_ever == TRUE)
+  )
+
+# parent_tasks_all_time_total <- parent_tasks_all_time_by_task %>%
+
+```
 Quantify whether tasks have been performed over course of entire run.
 
+#### Parent Org
+
+
+
+#### Number of Task
 ```{r}
 # Pivot task data long:
 # 1) Select only relevant columns
@@ -883,3 +961,76 @@ ggsave(
 )
 
 ```
+
+
+
+
+
+
+# Some weird overtime data
+
+```{r}
+# Pivot task data long:
+# 1) Select only relevant columns
+connected <- time_data %>%
+  select(
+    SEED,
+    treatment,
+    update,
+    Tasks_sym_task_AND_NOT,
+    Tasks_sym_task_AND,
+    Tasks_sym_task_EQU,
+    Tasks_sym_task_NAND,
+    Tasks_sym_task_NOR,
+    Tasks_sym_task_NOT,
+    Tasks_sym_task_OR_NOT,
+    Tasks_sym_task_OR,
+    Tasks_sym_task_XOR,
+    Tasks_host_task_AND_NOT,
+    Tasks_host_task_AND,
+    Tasks_host_task_EQU,
+    Tasks_host_task_NAND,
+    Tasks_host_task_NOR,
+    Tasks_host_task_NOT,
+    Tasks_host_task_OR_NOT,
+    Tasks_host_task_OR,
+    Tasks_host_task_XOR
+  )
+
+connected %>%
+  ggplot( aes(x=update, y=n, group=name, color=name)) +
+      geom_line() +
+      scale_color_viridis(discrete = TRUE) +
+      ggtitle("Simiularty between")+
+      theme_ipsum() +
+      ylab("Number of babies born")
+
+
+
+```
+
+
+
+```{r}
+connected_plt <- connected %>%
+  ggplot(
+    aes(x = connected, color = treatment, fill = treatment, y = update)
+  ) +
+  geom_line(alpha = 0.8, linewidth = 1) +
+  scale_x_discrete() +
+  facet_wrap(~task) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 65,
+      hjust = 1
+    )
+  )
+ggsave(
+  file = paste(plot_dir, "Connected.pdf", sep = "/"),
+  plot = connected_plt,
+  width = 20,
+  height = 20
+)
+```
+
