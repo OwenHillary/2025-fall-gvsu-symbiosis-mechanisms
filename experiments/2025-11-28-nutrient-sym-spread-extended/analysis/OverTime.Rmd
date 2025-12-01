@@ -1,0 +1,242 @@
+# This is the Script for generationg the over Time in Grpahs 
+## Intialization 
+
+### Setup
+
+```{r}
+library(tidyverse)
+library(cowplot)
+library(RColorBrewer)
+library(khroma)
+library(rstatix)
+library(knitr)
+library(kableExtra)
+library(viridis)
+
+# library(webshot2)
+```
+
+```{r}
+# Build relative path from R's working directory to what is actually the working
+# directory for this experiment.
+experiment_slug <- "2025-11-14-nutrient-spread-cost"
+working_directory <- paste(
+  # "2025-fall-gvsu-symbiosis-mechanisms",
+  "experiments",
+  experiment_slug,
+  "analysis",
+  sep = "/"
+)
+
+```
+
+```{r}
+# Use the cowplot theme as our default for ggplots
+theme_set(theme_cowplot())
+# Create directory to save plots
+plot_dir <- paste(
+  working_directory,
+  "OverTime_plots",
+  sep = "/"
+)
+
+
+dir.create(
+  plot_dir,
+  showWarnings = FALSE
+)
+```
+
+### Load and preprocess data
+
+```{r}
+tasks <- c("NOT", "NAND", "OR_NOT", "AND", "OR", "AND_NOT", "NOR", "XOR", "EQU")
+max_pop_size <- 80 * 80
+threshold <- 0.025 * max_pop_size
+```
+
+```{r}
+time_data_path <- paste(
+  working_directory,
+  "data",
+  "time_series.csv",
+  sep = "/"
+)
+time_data <- read_csv(time_data_path)
+
+# Do any universal preprocessing
+time_data <- time_data %>%
+  mutate(
+    SEED = as.factor(SEED),
+    HOST_REPRO_RES_num = as.numeric(HOST_REPRO_RES),
+    HOST_REPRO_RES = as.factor(HOST_REPRO_RES),
+    SYM_HORIZ_TRANS_RES = as.factor(SYM_HORIZ_TRANS_RES),
+
+  ) %>%
+  mutate(
+    treatment = paste0(
+      "HCost:", HOST_REPRO_RES,
+      " SCost:", SYM_HORIZ_TRANS_RES
+    )
+  ) %>%
+  mutate(
+    treatment = as.factor(treatment)
+  ) %>%
+  mutate(
+    treatment = fct_reorder(treatment, HOST_REPRO_RES_num)
+  )
+```
+
+
+## Data Setup
+
+### Host
+
+```{r}
+host_over_time_parent_task_data <- time_data %>%
+  select(
+    SEED,
+    treatment,
+    update,
+    CurUpdate_AND_NOT_in_host_parent_org_counts,
+    CurUpdate_AND_in_host_parent_org_counts,
+    CurUpdate_EQU_in_host_parent_org_counts,
+    CurUpdate_NAND_in_host_parent_org_counts,
+    CurUpdate_NOR_in_host_parent_org_counts,
+    CurUpdate_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_in_host_parent_org_counts,
+    CurUpdate_XOR_in_host_parent_org_counts
+  ) %>%
+  pivot_longer(
+    c(
+      CurUpdate_AND_NOT_in_host_parent_org_counts,
+      CurUpdate_AND_in_host_parent_org_counts,
+      CurUpdate_EQU_in_host_parent_org_counts,
+      CurUpdate_NAND_in_host_parent_org_counts,
+      CurUpdate_NOR_in_host_parent_org_counts,
+      CurUpdate_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_in_host_parent_org_counts,
+      CurUpdate_XOR_in_host_parent_org_counts
+    ),
+    names_to = "task",
+    values_to = "task_in_parent_count"
+  ) %>%
+  mutate(
+    task = str_replace(task, "CurUpdate_", "")
+  ) %>%
+  mutate(
+    task = str_replace(task, "_in_host_parent_org_counts", "")
+  ) %>%
+
+
+
+```
+
+
+### Sym
+
+```{r}
+over_time_sym_parent_task_data <- time_data %>%
+  select(
+    SEED,
+    treatment,
+    update,
+    CurUpdate_AND_NOT_in_sym_parent_org_counts,
+    CurUpdate_AND_in_sym_parent_org_counts,
+    CurUpdate_EQU_in_sym_parent_org_counts,
+    CurUpdate_NAND_in_sym_parent_org_counts,
+    CurUpdate_NOR_in_sym_parent_org_counts,
+    CurUpdate_NOT_in_sym_parent_org_counts,
+    CurUpdate_OR_NOT_in_sym_parent_org_counts,
+    CurUpdate_OR_in_sym_parent_org_counts,
+    CurUpdate_XOR_in_sym_parent_org_counts
+  ) %>%
+  pivot_longer(
+    c(
+      CurUpdate_AND_NOT_in_sym_parent_org_counts,
+      CurUpdate_AND_in_sym_parent_org_counts,
+      CurUpdate_EQU_in_sym_parent_org_counts,
+      CurUpdate_NAND_in_sym_parent_org_counts,
+      CurUpdate_NOR_in_sym_parent_org_counts,
+      CurUpdate_NOT_in_sym_parent_org_counts,
+      CurUpdate_OR_NOT_in_sym_parent_org_counts,
+      CurUpdate_OR_in_sym_parent_org_counts,
+      CurUpdate_XOR_in_sym_parent_org_counts
+    ),
+    names_to = "task",
+    values_to = "task_in_parent_count"
+  ) %>%
+  mutate(
+    task = str_replace(task, "CurUpdate_", "")
+  ) %>%
+  mutate(
+    task = str_replace(task, "_in_sym_parent_org_counts", "")
+  ) %>%
+  mutate(
+    task_completed_by_parent = task_in_parent_count >= threshold,
+    task = factor(
+      task,
+      levels = tasks,
+      labels = tasks
+    )
+  )
+```
+
+## Graph Making 
+### Setup
+```{r}
+over_time_sym_parent_task_data <- over_time_sym_parent_task_data %>%
+  mutate(org_type = "symbiont")
+
+host_over_time_parent_task_data <- host_over_time_parent_task_data %>%
+  mutate(org_type = "host")
+
+over_time_parent_task_data <- full_join(
+  over_time_sym_parent_task_data,
+  host_over_time_parent_task_data
+)
+over_time_parent_task_data <- over_time_parent_task_data %>%
+  mutate(
+    org_type = as.factor(org_type)
+  )
+```
+
+### Generating 
+```{r}
+treatments <- levels(over_time_parent_task_data$treatment)
+
+for (trt in treatments) {
+  p <- over_time_parent_task_data %>%
+    filter(treatment == trt) %>%
+    ggplot(
+      aes(
+        x = update,
+        y = task_in_parent_count,
+        color = org_type,
+        fill = org_type
+      )
+    ) +
+    geom_line() +
+    labs(
+      title = trt
+    ) +
+    facet_grid(
+      SEED ~ task,
+      scales = "free_y",
+      labeller = label_both
+    )
+
+  ggsave(
+    file = paste(
+      plot_dir,
+      paste0("tasks_over_time_", trt, ".pdf"),
+      sep = "/"
+    ),
+    plot = p,
+    width = 20,
+    height = 40
+  )
+}
+```
