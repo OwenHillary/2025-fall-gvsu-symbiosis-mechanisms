@@ -19,7 +19,7 @@ library(viridis)
 ```{r}
 # Build relative path from R's working directory to what is actually the working
 # directory for this experiment.
-experiment_slug <- "2025-11-28-nutrient-sym-spread-extended"
+experiment_slug <- "2025-11-14-nutrient-spread-cost"
 working_directory <- paste(
   # "2025-fall-gvsu-symbiosis-mechanisms",
   "experiments",
@@ -68,20 +68,22 @@ time_data <- read_csv(time_data_path)
 time_data <- time_data %>%
   mutate(
     SEED = as.factor(SEED),
-    SYM_HORIZ_TRANS_RES_num = as.numeric(SYM_HORIZ_TRANS_RES),
+    HOST_REPRO_RES_num = as.numeric(HOST_REPRO_RES),
+    HOST_REPRO_RES = as.factor(HOST_REPRO_RES),
     SYM_HORIZ_TRANS_RES = as.factor(SYM_HORIZ_TRANS_RES),
 
   ) %>%
   mutate(
     treatment = paste0(
-      "SCost:", SYM_HORIZ_TRANS_RES
+      "HCost:", HOST_REPRO_RES,
+      " SCost:", SYM_HORIZ_TRANS_RES
     )
   ) %>%
   mutate(
     treatment = as.factor(treatment)
   ) %>%
   mutate(
-    treatment = fct_reorder(treatment, SYM_HORIZ_TRANS_RES_num)
+    treatment = fct_reorder(treatment, HOST_REPRO_RES_num)
   )
 ```
 
@@ -126,7 +128,10 @@ host_over_time_parent_task_data <- time_data %>%
   ) %>%
   mutate(
     task = str_replace(task, "_in_host_parent_org_counts", "")
-  )
+  ) %>%
+
+
+
 ```
 
 

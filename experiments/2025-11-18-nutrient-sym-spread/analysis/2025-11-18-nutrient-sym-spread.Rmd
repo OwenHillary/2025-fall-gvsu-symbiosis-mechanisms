@@ -51,7 +51,7 @@ dir.create(
 ```{r}
 tasks <- c("NOT", "NAND", "OR_NOT", "AND", "OR", "AND_NOT", "NOR", "XOR", "EQU")
 max_pop_size <- 80 * 80
-threshold <- 0.01 * max_pop_size
+threshold <- 0.025 * max_pop_size
 ```
 
 Load summary data.
@@ -374,34 +374,38 @@ host_over_time_parent_task_data <- time_data %>%
     SEED,
     treatment,
     update,
-    Tasks_host_task_AND_NOT,
-    Tasks_host_task_AND,
-    Tasks_host_task_EQU,
-    Tasks_host_task_NAND,
-    Tasks_host_task_NOR,
-    Tasks_host_task_NOT,
-    Tasks_host_task_OR_NOT,
-    Tasks_host_task_OR,
-    Tasks_host_task_XOR
+    CurUpdate_AND_NOT_in_host_parent_org_counts,
+    CurUpdate_AND_in_host_parent_org_counts,
+    CurUpdate_EQU_in_host_parent_org_counts,
+    CurUpdate_NAND_in_host_parent_org_counts,
+    CurUpdate_NOR_in_host_parent_org_counts,
+    CurUpdate_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_NOT_in_host_parent_org_counts,
+    CurUpdate_OR_in_host_parent_org_counts,
+    CurUpdate_XOR_in_host_parent_org_counts
   ) %>%
   pivot_longer(
     c(
-      Tasks_host_task_AND_NOT,
-      Tasks_host_task_AND,
-      Tasks_host_task_EQU,
-      Tasks_host_task_NAND,
-      Tasks_host_task_NOR,
-      Tasks_host_task_NOT,
-      Tasks_host_task_OR_NOT,
-      Tasks_host_task_OR,
-      Tasks_host_task_XOR
+      CurUpdate_AND_NOT_in_host_parent_org_counts,
+      CurUpdate_AND_in_host_parent_org_counts,
+      CurUpdate_EQU_in_host_parent_org_counts,
+      CurUpdate_NAND_in_host_parent_org_counts,
+      CurUpdate_NOR_in_host_parent_org_counts,
+      CurUpdate_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_NOT_in_host_parent_org_counts,
+      CurUpdate_OR_in_host_parent_org_counts,
+      CurUpdate_XOR_in_host_parent_org_counts
     ),
     names_to = "task",
     values_to = "task_in_parent_count"
   ) %>%
   mutate(
-    task = str_replace(task, "Tasks_host_task_", "")
+    task = str_replace(task, "CurUpdate_", "")
   ) %>%
+  mutate(
+    task = str_replace(task, "_in_host_parent_org_counts", "")
+  ) %>%
+
   mutate(
     task_completed_by_parent = task_in_parent_count >= threshold,
     task = factor(
@@ -475,33 +479,36 @@ over_time_sym_parent_task_data <- time_data %>%
     SEED,
     treatment,
     update,
-    Tasks_sym_task_AND_NOT,
-    Tasks_sym_task_AND,
-    Tasks_sym_task_EQU,
-    Tasks_sym_task_NAND,
-    Tasks_sym_task_NOR,
-    Tasks_sym_task_NOT,
-    Tasks_sym_task_OR_NOT,
-    Tasks_sym_task_OR,
-    Tasks_sym_task_XOR
+    CurUpdate_AND_NOT_in_sym_parent_org_counts,
+    CurUpdate_AND_in_sym_parent_org_counts,
+    CurUpdate_EQU_in_sym_parent_org_counts,
+    CurUpdate_NAND_in_sym_parent_org_counts,
+    CurUpdate_NOR_in_sym_parent_org_counts,
+    CurUpdate_NOT_in_sym_parent_org_counts,
+    CurUpdate_OR_NOT_in_sym_parent_org_counts,
+    CurUpdate_OR_in_sym_parent_org_counts,
+    CurUpdate_XOR_in_sym_parent_org_counts
   ) %>%
   pivot_longer(
     c(
-      Tasks_sym_task_AND_NOT,
-      Tasks_sym_task_AND,
-      Tasks_sym_task_EQU,
-      Tasks_sym_task_NAND,
-      Tasks_sym_task_NOR,
-      Tasks_sym_task_NOT,
-      Tasks_sym_task_OR_NOT,
-      Tasks_sym_task_OR,
-      Tasks_sym_task_XOR
+      CurUpdate_AND_NOT_in_sym_parent_org_counts,
+      CurUpdate_AND_in_sym_parent_org_counts,
+      CurUpdate_EQU_in_sym_parent_org_counts,
+      CurUpdate_NAND_in_sym_parent_org_counts,
+      CurUpdate_NOR_in_sym_parent_org_counts,
+      CurUpdate_NOT_in_sym_parent_org_counts,
+      CurUpdate_OR_NOT_in_sym_parent_org_counts,
+      CurUpdate_OR_in_sym_parent_org_counts,
+      CurUpdate_XOR_in_sym_parent_org_counts
     ),
     names_to = "task",
     values_to = "task_in_parent_count"
   ) %>%
   mutate(
-    task = str_replace(task, "Tasks_sym_task_", "")
+    task = str_replace(task, "CurUpdate_", "")
+  ) %>%
+  mutate(
+    task = str_replace(task, "_in_sym_parent_org_counts", "")
   ) %>%
   mutate(
     task_completed_by_parent = task_in_parent_count >= threshold,

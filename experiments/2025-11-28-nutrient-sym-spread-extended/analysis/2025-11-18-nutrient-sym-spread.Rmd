@@ -18,7 +18,7 @@ library(viridis)
 ```{r}
 # Build relative path from R's working directory to what is actually the working
 # directory for this experiment.
-experiment_slug <- "2025-11-18-nutrient-sym-spread"
+experiment_slug <- "2025-11-28-nutrient-sym-spread-extended"
 working_directory <- paste(
   # "2025-fall-gvsu-symbiosis-mechanisms",
   "experiments",
@@ -51,7 +51,7 @@ dir.create(
 ```{r}
 tasks <- c("NOT", "NAND", "OR_NOT", "AND", "OR", "AND_NOT", "NOR", "XOR", "EQU")
 max_pop_size <- 80 * 80
-threshold <- 0.01 * max_pop_size
+threshold <- 0.025 * max_pop_size
 ```
 
 Load summary data.
