@@ -81,7 +81,8 @@ sym_int_vals_fields_summary = {
 run_cfg_fields_time_series = {
     "SEED",
     
-    "SYM_HORIZ_TRANS_RES",
+    "NUTRIENT_DONATE_PROP",
+    "NUTRIENT_INTERACTION_MULTIPLIER"
 }
 
 org_counts_fields_time_series = {
