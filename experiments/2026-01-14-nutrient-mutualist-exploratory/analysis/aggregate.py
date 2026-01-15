@@ -62,6 +62,7 @@ run_cfg_fields_summary = {
     "NUTRIENT_STEAL_PROP",
     "NUTRIENT_INTERACTION_MULTIPLIER",
     "PARASITE_BASE_TASK_VALUE_PROP",
+    "NUTRIENT_DONATE_PROP",
 
     # Feilds I use often
     "HOST_REPRO_RES",
