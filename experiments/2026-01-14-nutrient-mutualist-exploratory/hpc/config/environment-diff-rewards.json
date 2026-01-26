@@ -3,13 +3,13 @@
     "tasks": [
       {"name": "NOT", "value": 1, "reward_mode": "add"},
       {"name": "NAND", "value": 1, "reward_mode": "add"},
-      {"name": "OR_NOT", "value": 1, "reward_mode": "add"},
-      {"name": "AND", "value": 1, "reward_mode": "add"},
-      {"name": "OR", "value": 1, "reward_mode": "add"},
-      {"name": "AND_NOT", "value": 1, "reward_mode": "add"},
-      {"name": "NOR", "value": 1, "reward_mode": "add"},
-      {"name": "XOR", "value": 1, "reward_mode": "add"},
-      {"name": "EQU", "value": 1, "reward_mode": "add"}
+      {"name": "OR_NOT", "value": 2, "reward_mode": "add"},
+      {"name": "AND", "value": 2, "reward_mode": "add"},
+      {"name": "OR", "value": 4, "reward_mode": "add"},
+      {"name": "AND_NOT", "value": 4, "reward_mode": "add"},
+      {"name": "NOR", "value": 8, "reward_mode": "add"},
+      {"name": "XOR", "value": 8, "reward_mode": "add"},
+      {"name": "EQU", "value": 16, "reward_mode": "add"}
     ]
   }
 }
